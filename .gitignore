@@ -102,3 +102,11 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+# Tensorflow output folder
+output/
+*.pb
+all_files.*
+checkpoint
+model-1000.*
+my_test_model.*
