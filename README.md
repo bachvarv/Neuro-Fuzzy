@@ -10,7 +10,7 @@ Setting up the project in PyCharm.
   3. You should be able to start the programm like such:
     
     python tf_custom_training/take_3.py
-  3.1. or just start it normaly through the run option in pycharm
+  or just start it normaly through the run option in pycharm
   
       
   
