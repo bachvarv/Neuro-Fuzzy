@@ -107,6 +107,8 @@ loss = tf.losses.huber_loss(y, result)
 optimizer = tf.train.AdamOptimizer(learning_rate=0.01).minimize(loss)
 
 init = tf.global_variables_initializer()
+
+i = 2
 # Cliping
 # clip_a1 = tf.clip
 # clip_a1 = tf.clip_by_value(a1, 0.0, m1)
