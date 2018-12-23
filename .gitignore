@@ -108,6 +108,7 @@ venv.bak/
 
 # Tensorflow output folder
 output/
+output_test/
 *.pb
 all_files.*
 checkpoint
