@@ -2,7 +2,7 @@
 
 Setting up the project in PyCharm.
   1. Create a new Project in Pycharm.
-     * under _Project interpreter_ chose: _New environment using:_ **Virtualenv**
+     * under _Project interpreter_ chose: _New environment using_ **Virtualenv**
     
   2. If the virtualenv is not already activated, Activate the virtualenv like so:
   
