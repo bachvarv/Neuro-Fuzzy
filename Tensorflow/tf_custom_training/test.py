@@ -1,4 +1,4 @@
-from random import uniform
+from random import uniform, random
 
 import tensorflow as tf
 
@@ -39,6 +39,8 @@ with tf.Session() as sess:
     writer = tf.summary.FileWriter("output_test", graph=sess.graph)
 
     sess.run(f.init)
+
+    # sess.run(f.summ, feed_dict={f.x:[8]})
     # print(sess.run(f.x[0], feed_dict={f.x[0]: 10}))
     #
     # print(sess.run([f.summ], feed_dict={f.x[0]: 1.3}))
@@ -47,21 +49,31 @@ with tf.Session() as sess:
 
     print(sess.run([a1, m1, b1]))
 
-    for _ in range(50):
+    for _ in range(500):
         # does work but doesn't seem to change the value of the variables
-        candidate = uniform(1.01, 6.32)
+        # it does not work because the loss function doesn't calculate the right value for errors,
+        # when a candidate is beyond the mf's range.
+        if uniform(0, 1) < 0.5:
+            candidate = uniform(5.01, 6.32)
+            y = [[1.0 * candidate]]
+        else:
+            candidate = uniform(9.2, 12.1)
+            y = [[2.0 * candidate]]
         x = [[candidate]]
-        y = [[2.0 * candidate]]
+
         print("input:", candidate, f.doCalculation(sess, x))
 
-        print(f.train(sess, x, y))
+        print("Train Step:", f.train(sess, x, y))
 
     with tf.variable_scope("") as scope:
         scope.reuse_variables()
         a1 = tf.get_variable("a1")
         m1 = tf.get_variable("m1")
         b1 = tf.get_variable("b1")
+        a2 = tf.get_variable("a2")
+        m2 = tf.get_variable("m2")
+        b2 = tf.get_variable("b2")
 
-    print(sess.run([a1, m1, b1]))
+    print(sess.run(f.var))
 
     writer.close()

@@ -1,7 +1,7 @@
 import tensorflow as tf
 
 class Anfis:
-    #
+    # num_inputs is not being used. trying the simple way of calculating
     def __init__(self, mfParameters, num_inputs, num_rules, num_conclusions):
         size = len(mfParameters)
         self.mf = [None]*(size)
@@ -11,10 +11,10 @@ class Anfis:
         self.outputs = [tf.placeholder(dtype=tf.float32, shape=None)]*(num_conclusions)
         self.optimizer = None
         self.loss = None
+        self.var = [None] * size
         self.y = tf.placeholder(name="y", shape=(1, 1), dtype=tf.float32)
-        print(self.normalizedMFs[0])
         for i in range(num_inputs):
-            self.x = tf.placeholder(name="x"+str(i + 1), shape=(num_inputs, 1), dtype=tf.float32)
+            self.x = tf.placeholder(name="x"+str(i + 1), shape=(1, 1), dtype=tf.float32)
         self.mfParameters = mfParameters
         # print(len(self.mfParameters))
         index = 1
@@ -26,6 +26,7 @@ class Anfis:
             a = tf.get_variable(name="a"+str(index), dtype=tf.float32, initializer=tf.constant(i[0]), trainable=1)
             m = tf.get_variable(name="m"+str(index), dtype=tf.float32, initializer=tf.constant(i[1]), trainable=1)
             b = tf.get_variable(name="b"+str(index), dtype=tf.float32, initializer=tf.constant(i[2]), trainable=1)
+            self.var[index - 1] = [a, m, b]
 
             with tf.variable_scope("mfs", reuse=tf.AUTO_REUSE):
                 self.mf[(index - 1)] = self.triangularMF(self.x, a, m, b, ("mf" + str(index)))
@@ -46,9 +47,9 @@ class Anfis:
 
     def triangularMF(self, x, a, m, b, name):
         # min_left = (x - a1) / (m1 - a1)
-        min_left = tf.divide(tf.subtract(x, a), tf.subtract(m, a))
+        min_left = tf.divide(tf.abs(tf.subtract(x, a)), tf.subtract(m, a))
         # min_right = (b1 - x) / (b1 - m1)
-        min_right = tf.divide(tf.subtract(b, x), tf.subtract(b, m))
+        min_right = tf.divide(tf.abs(tf.subtract(b, x)), tf.subtract(b, m))
         min_func = tf.minimum(min_left, min_right)
         # divisor_1 = tf.subtract(b1, a1)
         # dividend_1 = tf.abs(tf.subtract(x, m1))
@@ -81,7 +82,7 @@ class Anfis:
     def optimizeMethod(self):
         self.loss = tf.losses.mean_squared_error(self.y, self.summ)
 
-        self.optimizer = tf.train.GradientDescentOptimizer(learning_rate=0.1).minimize(self.loss)
+        self.optimizer = tf.train.GradientDescentOptimizer(learning_rate=0.01).minimize(self.loss)
 
     def train(self, sess, x, y):
         return sess.run([self.loss, self.optimizer], feed_dict={self.x: x, self.y: y})
