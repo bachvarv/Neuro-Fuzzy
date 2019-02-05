@@ -89,9 +89,9 @@ with tf.name_scope("Layer_2_3"):
 
 with tf.name_scope("Layer_4"):
     with tf.name_scope("w1_f1"):
-        w1_f1 = tf.multiply(m_1, tf.multiply(2.0, x), name="w1_f1")
+        w1_f1 = tf.multiply(w1_norm, tf.multiply(2.0, x), name="w1_f1")
     with tf.name_scope("w2_f2"):
-        w2_f2 = tf.multiply(m_2, tf.sqrt(x), name="w2_f2")
+        w2_f2 = tf.multiply(w2_norm, tf.sqrt(x), name="w2_f2")
 
 with tf.name_scope("Layer_5"):
     result = tf.add(w1_f1, w2_f2, name="f")
