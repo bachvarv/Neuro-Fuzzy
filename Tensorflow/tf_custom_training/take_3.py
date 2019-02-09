@@ -171,6 +171,7 @@ with tf.Session() as sess:
     print(sess.run([result, loss], feed_dict={x: 10, y: 20}))
     print(sess.run([result, loss], feed_dict={x: 13, y: 26}))
 
+
     # print(cost_sum)
     # # for i in range(len(y_Val)):
     #     print("Expected Value:", result_val[i], "; Computed Value:", y_Val[i], "; Error:",
