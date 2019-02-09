@@ -1,4 +1,8 @@
+import os
+
 import tensorflow as tf
+
+dir = os.path.dirname(os.path.realpath(__file__))
 
 class Anfis:
     # num_inputs is not being used. trying the simple way of calculating
@@ -14,6 +18,7 @@ class Anfis:
         self.var = [None] * size
         self.summ_of_mf = tf.get_variable(name="summOfMF", dtype=tf.float32, initializer=tf.constant(0.0))
         self.y = tf.placeholder(name="y", shape=(1, 1), dtype=tf.float32)
+        self.saver = tf.train.Saver()
         for i in range(num_inputs):
             self.x = tf.placeholder(name="x"+str(i + 1), shape=(1, 1), dtype=tf.float32)
         self.mfParameters = mf_param
@@ -77,9 +82,13 @@ class Anfis:
             self.summ_of_mf = tf.add(self.summ_of_mf, self.mf[i])
         for i in range(len(self.mf)):
             self.normalizedMFs[i] = tf.divide(self.mf[i], self.summ_of_mf)
+            out = tf.get_variable(name="output"+str(i), shape=(), dtype=tf.float32)
+            tf.add_to_collection("outputs", out)
+            self.outputs[i] = tf.multiply(self.normalizedMFs[i], out)
 
     def outputTensor(self, index, tensor):
-        self.outputs[index] = tf.multiply(self.normalizedMFs[index], tensor)
+        collection = tf.get_collection("outputs")
+        collection[index] = tensor
         # self.outputs[index] = tf.multiply(self.mf[index], tensor)
 
     def outputLayer(self, num_rules, num_inputs):
@@ -101,13 +110,15 @@ class Anfis:
                 a = tf.get_variable(name="a"+str(index), dtype=tf.float32, initializer=tf.constant(i[0]), trainable=1)
                 m = tf.get_variable(name="m"+str(index), dtype=tf.float32, initializer=tf.constant(i[1]), trainable=1)
                 b = tf.get_variable(name="b"+str(index), dtype=tf.float32, initializer=tf.constant(i[2]), trainable=1)
-                self.var[index - 1] = [a, m, b]
+                self.var[index - 1] = a, m, b
 
                 with tf.variable_scope("mfs", reuse=tf.AUTO_REUSE):
                     self.mf[(index - 1)] = self.triangularMF(self.x, a, m, b, ("mf" + str(index)))
 
                 index += 1
             self.normLayer()
+
+            tf.add_to_collection("mf", self.var)
 
 
     def doCalculation(self, sess, x):
@@ -124,6 +135,9 @@ class Anfis:
 
     def getVariableInitializer(self):
         return tf.global_variables_initializer()
+
+    def save_graph(self, sess, name, step):
+        self.saver.save(sess, dir + "/model/" + name, global_step=step)
 
     def train(self, sess, x, y):
         return sess.run([self.loss, self.optimizer], feed_dict={self.x: x, self.y: y})

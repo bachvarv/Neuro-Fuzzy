@@ -25,8 +25,6 @@ with tf.variable_scope("") as scope:
 
 # mfs = tf.reshape(f.normalizedMFs, shape=[])
 
-print(f.outputs)
-
 f.outputTensor(0, tf.multiply(f.x[0], 2))
 
 f.outputTensor(1, tf.multiply(f.x[0], 0.5))
@@ -50,6 +48,13 @@ with tf.Session() as sess:
 
     sess.run(f.getVariableInitializer())
 
+    # var_coll = tf.get_collection("outputs")
+
+    # print("Collection", var_coll)
+    # print("Trying to get MF1:", sess.run(var_coll[0]))
+
+    print("Variable 1: ", sess.run(a1))
+
     # sess.run(f.summ, feed_dict={f.x:[8]})
     # print(sess.run(f.x[0], feed_dict={f.x[0]: 10}))
     # print(sess.run(f.mf[0], feed_dict={f.x: [[7.0]]}))
@@ -63,7 +68,7 @@ with tf.Session() as sess:
     print("Membership function: ", sess.run(f.mf[1], feed_dict={f.x: [[2.297]]}))
     print("Summ Of MemberShip Function: ", sess.run(f.summ_of_mf, feed_dict={f.x: [[2.297]]}))
 
-    for _ in range(1000):
+    for _ in range(100):
         # does work but doesn't seem to change the value of the variables
         # it does not work because the loss function doesn't calculate the right value for errors,
         # when a candidate is beyond the mf's range.
@@ -98,5 +103,7 @@ with tf.Session() as sess:
     print(sess.run(a1))
 
     print(sess.run(f.var))
+
+    f.save_graph(sess, "model", 1000)
 
     writer.close()
