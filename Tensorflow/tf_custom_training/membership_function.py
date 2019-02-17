@@ -1,5 +1,12 @@
 import tensorflow as tf
 
+a = [None]*2
+a[0] = [0.4]
+a[1] = [0.2]
+
+print(a)
+f = tf.reshape(a, shape=(2, 1))
+
 
 x = tf.placeholder(name="x", shape=(None, 1), dtype=tf.float32)
 
@@ -66,39 +73,40 @@ mfresult2 = tf.multiply(mfweight2, tf.multiply(x, 0.5))
 result = tf.add(mfresult1, mfresult2)
 
 with tf.Session() as sess:
+    print(sess.run(f))
     # print(sess.run(x, feed_dict={x: [[3]]}))
 
     # print("MF1:", sess.run(mf_1, feed_dict={x: [[5.5]]}))
 
-    print("Result 1:", sess.run(mfresult1, feed_dict={x: [[9.297]]}))
+    # print("Result 1:", sess.run(mfresult1, feed_dict={x: [[9.297]]}))
 
     # print("MF2:", sess.run(mf_2, feed_dict={x: [[5.5]]}))
-    print("Result 2:", sess.run(mfresult2, feed_dict={x: [[9.297]]}))
-
-    print("Dividend:", sess.run(dividend, feed_dict={x: [[9.297]]}))
-
-    print("Dividend_1:", sess.run(dividend_1, feed_dict={x: [[9.297]]}))
-
-    print("MFleft1:", sess.run(mfleft_1, feed_dict={x: [[9.297]]}))
-    print("MFright1:", sess.run(mfright_1, feed_dict={x: [[9.297]]}))
-
-    print("MF1 min:", sess.run(mf_1, feed_dict={x: [[9.297]]}))
-    print("MFWeigt 1:", sess.run(mfweight1, feed_dict={x: [[9.297]]}))
-
-    print("--------------------------------------------------------")
-
-    print("MFleft2:", sess.run(mfleft_2, feed_dict={x: [[9.297]]}))
-    print("MFright2:", sess.run(mfright_2, feed_dict={x: [[9.297]]}))
-
-    print("Dividend21:", sess.run(dividend_21, feed_dict={x: [[9.297]]}))
-
-    print("Dividend_22:", sess.run(dividend_22, feed_dict={x: [[9.297]]}))
-
-    print("MF2 min:", sess.run(mf_2, feed_dict={x:[[9.297]]}))
-    print("MFWeigt 2:", sess.run(mfweight2, feed_dict={x: [[9.297]]}))
+    # print("Result 2:", sess.run(mfresult2, feed_dict={x: [[9.297]]}))
+    #
+    # print("Dividend:", sess.run(dividend, feed_dict={x: [[9.297]]}))
+    #
+    # print("Dividend_1:", sess.run(dividend_1, feed_dict={x: [[9.297]]}))
+    #
+    # print("MFleft1:", sess.run(mfleft_1, feed_dict={x: [[9.297]]}))
+    # print("MFright1:", sess.run(mfright_1, feed_dict={x: [[9.297]]}))
+    #
+    # print("MF1 min:", sess.run(mf_1, feed_dict={x: [[9.297]]}))
+    # print("MFWeigt 1:", sess.run(mfweight1, feed_dict={x: [[9.297]]}))
+    #
+    # print("--------------------------------------------------------")
+    #
+    # print("MFleft2:", sess.run(mfleft_2, feed_dict={x: [[9.297]]}))
+    # print("MFright2:", sess.run(mfright_2, feed_dict={x: [[9.297]]}))
+    #
+    # print("Dividend21:", sess.run(dividend_21, feed_dict={x: [[9.297]]}))
+    #
+    # print("Dividend_22:", sess.run(dividend_22, feed_dict={x: [[9.297]]}))
+    #
+    # print("MF2 min:", sess.run(mf_2, feed_dict={x:[[9.297]]}))
+    # print("MFWeigt 2:", sess.run(mfweight2, feed_dict={x: [[9.297]]}))
 
     # print("Weight1:", sess.run(mfweight1, feed_dict={x: [[5.5]]}))
     #
     # print("Weight2:", sess.run(mfweight2, feed_dict={x: [[5.5]]}))
 
-    print(sess.run(result, feed_dict={x: [[9.297]]}))
+    # print(sess.run(result, feed_dict={x: [[9.297]]}))

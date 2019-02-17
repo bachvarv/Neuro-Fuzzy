@@ -1,10 +1,6 @@
 import random
-from distutils.command.install_egg_info import install_egg_info
 
 import tensorflow as tf
-
-import numpy as np
-from tensorflow.contrib import learn
 
 x = tf.placeholder(dtype=tf.float32, name="X")
 y = tf.placeholder(dtype=tf.float32, name="Y")
