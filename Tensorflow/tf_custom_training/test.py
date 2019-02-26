@@ -109,7 +109,7 @@ with tf.Session() as sess:
     # print("Reshaped:", sess.run(f.reshaped_nmfs, feed_dict={f.x: [[3.3]]}))
     # print("Reshaped Outputs:", sess.run(f.y_funcs, feed_dict={f.x: [[3.3]]}))
 
-    for _ in range(500):
+    for _ in range(10000):
         # does work but doesn't seem to change the value of the variables
         # it does not work because the loss function doesn't calculate the right value for errors,
         # when a candidate is beyond the mf's range.

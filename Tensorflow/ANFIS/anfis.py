@@ -121,7 +121,7 @@ class Anfis:
         self.normalizedMFs = tf.divide(self.reshaped_mfs, tf.reduce_sum(self.reshaped_mfs))
 
     def defconclussions(self):
-        self.conclussions = tf.add(self.a_0, tf.multiply(self.a_y, self.x), name="outputs")
+        self.conclussions = tf.add(self.a_0, tf.reduce_sum(tf.multiply(self.a_y, self.x)), name="outputs")
         # self.conclussions = tf.reduce_sum(self.conclussions, axis=0)
 
     # def normLayer(self):
@@ -175,13 +175,16 @@ class Anfis:
                     a = tf.get_variable(name="a" + str(index), dtype=tf.float32,
                                         initializer=tf.constant(i[0]), trainable=1)
                 m = tf.get_variable(name="m"+str(index), dtype=tf.float32, initializer=tf.constant(i[1]), trainable=1)
-
+                #
                 if(index == len(mf_param)):
                     b = tf.get_variable(name="b"+str(index), dtype=tf.float32,
                                         initializer=tf.constant(i[2]), trainable=0)
                 else:
                     b = tf.get_variable(name="b" + str(index), dtype=tf.float32,
                                         initializer=tf.constant(i[2]), trainable=1)
+
+                tf.clip_by_value(m, clip_value_min=a, clip_value_max=b)
+
                 self.var[index - 1] = a, m, b
 
                 with tf.variable_scope("mfs", reuse=tf.AUTO_REUSE):
