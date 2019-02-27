@@ -223,3 +223,6 @@ class Anfis:
 
     def fifthLayer(self):
         self.result = tf.reduce_sum(self.outputs)
+
+    # def plot(self):
+

@@ -1,6 +1,5 @@
-from random import uniform, random
-
-from tensorflow.python import debug as tf_debug
+from random import uniform
+import matplotlib.pyplot as plt
 
 import tensorflow as tf
 
@@ -20,34 +19,6 @@ f = Anfis(mf_param=a, num_inputs=num_inputs, num_rules=num_rules)
 
 for i in a:
     print(i)
-
-with tf.variable_scope("") as scope:
-    scope.reuse_variables()
-    a1 = tf.get_variable("a1", [])
-    m1 = tf.get_variable("m1", [])
-    b1 = tf.get_variable("b1", [])
-
-# mfs = tf.reshape(f.normalizedMFs, shape=[])
-
-
-# f.outputTensor(0, tf.multiply(f.x, 2.0))
-# f.outputTensor(1, tf.divide(f.x, 2.))
-
-# FIXME:
-# f.normLayer()
-# f.outputLayer(num_rules, num_inputs)
-
-# print(f.mf[0])
-#
-# print(f.outputs[1])
-
-
-
-# initializer = f.getVariableInitializer()
-
-# with tf.variable_scope("mfs") as scope:
-#     scope.reuse_variables()
-#     mf1 = tf.get_variable("mf1", [])
 
 with tf.Session() as sess:
     # sess = tf_debug.TensorBoardDebugWrapperSession(sess, "bachvarv:6064")
@@ -108,8 +79,26 @@ with tf.Session() as sess:
     # print("Outputs", sess.run(f.outputs, feed_dict={f.x: [[3.3]]}))
     # print("Reshaped:", sess.run(f.reshaped_nmfs, feed_dict={f.x: [[3.3]]}))
     # print("Reshaped Outputs:", sess.run(f.y_funcs, feed_dict={f.x: [[3.3]]}))
+    x_val = []
+    y_val = []
+    cands = []
+    y_out = []
 
-    for _ in range(500):
+    x = 0.5
+    index = 0
+
+    plt.figure(figsize=(8.5, 5))
+
+    while(x < 9.0):
+        x_val.append(x)
+        y_val.append(x * x)
+        x = x + 0.5
+        index += 1
+
+    plt.plot(x_val, y_val, linestyle=':')
+
+    epochs = 5000
+    for _ in range(epochs):
         # does work but doesn't seem to change the value of the variables
         # it does not work because the loss function doesn't calculate the right value for errors,
         # when a candidate is beyond the mf's range.
@@ -122,40 +111,53 @@ with tf.Session() as sess:
         #     y = 0.5 * candidate
         #     print("Candidate:", candidate, "; Erwarteter Resultat", y)
         x = [candidate]
+        cands.append(candidate)
 
-        print("-----------------------------------------------------")
-        print("Candidate:", candidate, "; Erwarteter Resultat:", y)
-
-        print("MF0:", sess.run(f.mf[0], feed_dict={f.x: x}))
-        print("MF1:", sess.run(f.mf[1], feed_dict={f.x: x}))
-        print("Summ of MF'S:", sess.run(f.mf, feed_dict={f.x: x}))
-        print("NMF0:", sess.run(f.normalizedMFs, feed_dict={f.x: x}))
+        # print("Candidate:", candidate, "; Erwarteter Resultat:", y)
+        #
+        # print("MF0:", sess.run(f.mf[0], feed_dict={f.x: x}))
+        # print("MF1:", sess.run(f.mf[1], feed_dict={f.x: x}))
+        # print("Summ of MF'S:", sess.run(f.mf, feed_dict={f.x: x}))
+        # print("NMF0:", sess.run(f.normalizedMFs, feed_dict={f.x: x}))
         # print("NMF1:", sess.run(f.normalizedMFs[1][0], feed_dict={f.x: x}))
-        print("Output1:", sess.run(f.outputs, feed_dict={f.x: x}))
-        print("Conclussions:", sess.run(f.conclussions, feed_dict={f.x: x}))
+        # print("Output1:", sess.run(f.outputs, feed_dict={f.x: x}))
+        # print("Conclussions:", sess.run(f.conclussions, feed_dict={f.x: x}))
 
-        print("TEST1: input:", candidate, f.doCalculation(sess, x))
-        print("TEST2: input:", candidate, sess.run(f.result, feed_dict={f.x: x}))
+        print("Kandidat:", candidate, ";Erwarteter Resultat:", y, "; das Model ratet:", f.doCalculation(sess, x))
+        # print("TEST2: input:", candidate, sess.run(f.result, feed_dict={f.x: x}))
 
-        print("Train Step:", f.train(sess, x, y))
+        print("Fehlerrate für", candidate, ":", f.train(sess, x, y))
         print("-----------------------------------------------------")
-    with tf.variable_scope("") as scope:
-        scope.reuse_variables()
-        a1 = tf.get_variable("a1")
-        m1 = tf.get_variable("m1")
-        b1 = tf.get_variable("b1")
-        a2 = tf.get_variable("a2")
-        m2 = tf.get_variable("m2")
-        b2 = tf.get_variable("b2")
+    # with tf.variable_scope("") as scope:
+    #     scope.reuse_variables()
+    #     a1 = tf.get_variable("a1")
+    #     m1 = tf.get_variable("m1")
+    #     b1 = tf.get_variable("b1")
+    #     a2 = tf.get_variable("a2")
+    #     m2 = tf.get_variable("m2")
+    #     b2 = tf.get_variable("b2")
 
-    print(sess.run(a1))
+    # print(sess.run(a1))
+    a_y = sess.run(f.a_y)
+    a_0 = sess.run(f.a_0)
+    print("MFs:", sess.run(f.var))
+    print("a_0", a_0)
+    print("a_y:", a_y)
 
-    print(sess.run(f.var))
-    print("Self prims:")
-    print(sess.run(f.a_y))
-    print(sess.run(f.a_0))
-    print("------------------------------------------")
-    #
+    my_labels = ['f(x)= x^2', 'f(x)= ' + str(a_0[0][0]) + ' + ' + str(a_y[0][0])
+                 + ' * x and f(x)= ' + str(a_0[1][0]) + ' + ' + str(a_y[1][0]) + ' * x']
+
+    for i in range(len(x_val)):
+        y_out.append(f.doCalculation(sess, [x_val[i]]))
+
+    plt.plot(x_val, y_out, alpha=0.5, linestyle='--')
+
+    # save the graph for export
     # f.save_graph(sess, "model", 1000)
 
+    plt.legend(loc='upper left', labels = my_labels)
+    plt.savefig(str(epochs)+'_epochs.png')
+    plt.show()
+
+    # save the model in a file, which can be opened through tensorboard
     # writer.close()
