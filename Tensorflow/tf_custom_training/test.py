@@ -13,23 +13,44 @@ num_rules = 2
 
 num_inputs = 1
 
+num_sets = 6
+
 num_conclusions = 2
 
-f = Anfis(mf_param=a, num_inputs=num_inputs, num_rules=num_rules)
+mat = [[1, 2]]
 
-for i in a:
-    print(i)
+f = Anfis(range=[0.0, 10.0], num_inputs=num_inputs, num_sets=num_sets)
 
-with tf.Session() as sess:
+# for i in a:
+#     print(i)
+
+# f.mfs()
+
+with f.sess as sess:
     # sess = tf_debug.TensorBoardDebugWrapperSession(sess, "bachvarv:6064")
 
     # writer = tf.summary.FileWriter("output_test", graph=sess.graph)
 
+    # uninitialized_vars = []
+    # for var in f.all_variables():
+    #     try:
+    #        sess.run(var)
+    #     except tf.errors.FailedPreconditionError:
+    #         print(var)
+    #         uninitialized_vars.append(var)
+    #
+    # init_new_vars_op =  tf.variables_initializer(uninitialized_vars)
     sess.run(f.getVariableInitializer())
+    #
+    print(sess.run(f.var))
+    # print("Aktivierungswerte:", sess.run(f.rules_arr, feed_dict={f.x: [2.3]}))
+    # print("Zugehörigkeitsfunktionen:", sess.run(f.premisses, feed_dict={f.x: [2.3]}))
+    # print(f.rules_arr)
 
     # print("Result of MF1:", sess.run(f.mf[0], feed_dict={f.x: [2.3]}))
     # print("Result of MF2:", sess.run(f.mf[1], feed_dict={f.x: [2.3]}))
     # print("Result of both MFS:", sess.run(f.mf, feed_dict={f.x: [2.3]}))
+    # print(f.mf)
     #
     # print("Reshaped MFs", sess.run(f.reshaped_mfs, feed_dict={f.x: [2.3]}))
     #
@@ -81,7 +102,6 @@ with tf.Session() as sess:
     # print("Reshaped Outputs:", sess.run(f.y_funcs, feed_dict={f.x: [[3.3]]}))
     x_val = []
     y_val = []
-    cands = []
     y_out = []
 
     x = 0.5
@@ -97,21 +117,22 @@ with tf.Session() as sess:
 
     plt.plot(x_val, y_val, linestyle=':')
 
-    epochs = 5000
+    epochs = 2000
     for _ in range(epochs):
         # does work but doesn't seem to change the value of the variables
         # it does not work because the loss function doesn't calculate the right value for errors,
         # when a candidate is beyond the mf's range.
         # if uniform(0, 1) <= 0.5:
-        candidate = uniform(0.5, 9.0)
-        y = candidate * candidate
+        candidate = uniform(0.5, 10.0)
+        candidate_2 = uniform(0.5, 9.0)
+        y = (candidate * candidate)
         # else:
         #     candidate = uniform(6.0, 9.8)
         #     # print("Candidate:", candidate, "; Erwarteter Resultat", y)
         #     y = 0.5 * candidate
         #     print("Candidate:", candidate, "; Erwarteter Resultat", y)
         x = [candidate]
-        cands.append(candidate)
+        # cands.append(candidate)
 
         # print("Candidate:", candidate, "; Erwarteter Resultat:", y)
         #
@@ -123,11 +144,15 @@ with tf.Session() as sess:
         # print("Output1:", sess.run(f.outputs, feed_dict={f.x: x}))
         # print("Conclussions:", sess.run(f.conclussions, feed_dict={f.x: x}))
 
-        print("Kandidat:", candidate, ";Erwarteter Resultat:", y, "; das Model ratet:", f.doCalculation(sess, x))
+        print("Kandidat:", x, ";Erwarteter Resultat:", y, "; das Model ratet:", f.doCalculation(sess, x))
         # print("TEST2: input:", candidate, sess.run(f.result, feed_dict={f.x: x}))
 
         print("Fehlerrate für", candidate, ":", f.train(sess, x, y))
         print("-----------------------------------------------------")
+
+        print("a_0",  sess.run(f.a_0))
+        print("a_y:",  sess.run(f.a_y))
+        print("MFs:", sess.run(f.var))
     # with tf.variable_scope("") as scope:
     #     scope.reuse_variables()
     #     a1 = tf.get_variable("a1")
@@ -144,10 +169,11 @@ with tf.Session() as sess:
     print("a_0", a_0)
     print("a_y:", a_y)
 
-    my_labels = ['f(x)= x^2', 'f(x)= ' + str(a_0[0][0]) + ' + ' + str(a_y[0][0])
-                 + ' * x and f(x)= ' + str(a_0[1][0]) + ' + ' + str(a_y[1][0]) + ' * x']
+    # my_labels = ['f(x)= x^2', 'f(x)= ' + str(a_0[0][0]) + ' + ' + str(a_y[0][0])
+    #              + ' * x and f(x)= ' + str(a_0[1][0]) + ' + ' + str(a_y[1][0]) + ' * x']
 
     for i in range(len(x_val)):
+        # print(f.doCalculation(sess, [x_val[i]]))
         y_out.append(f.doCalculation(sess, [x_val[i]]))
 
     plt.plot(x_val, y_out, alpha=0.5, linestyle='--')
@@ -155,8 +181,8 @@ with tf.Session() as sess:
     # save the graph for export
     # f.save_graph(sess, "model", 1000)
 
-    plt.legend(loc='upper left', labels = my_labels)
-    plt.savefig(str(epochs)+'_epochs.png')
+    plt.legend(loc='upper left', labels = ["f(x)", "y°(x1)"])
+    # plt.savefig('../graphics/firstgraphics/' + str(epochs)+'_epochs.png')
     plt.show()
 
     # save the model in a file, which can be opened through tensorboard
