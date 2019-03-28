@@ -6,12 +6,22 @@ import itertools as it
 
 dir = os.path.dirname(os.path.realpath(__file__))
 
+
 class Anfis:
     # num_inputs is not being used. trying the simple way of calculating
-    def __init__(self, num_inputs, num_sets, range, mat=None):
+    def __init__(self, num_sets, range, mat=None, num_inputs=None):
         self.num_sets = num_sets
-        self.num_inputs = num_inputs
-        self.num_rules = num_sets ** num_inputs
+
+        # Last index of an array is the expected value.
+        # mat array is an array wich contains all the test data.
+        if (mat != None):
+            self.num_inputs = len(mat[0]) - 1
+        elif (num_inputs != None):
+            self.num_inputs = num_inputs
+        else:
+            self.num_inputs = 1
+
+        self.num_rules = num_sets ** self.num_inputs
         self.range = range
 
         self.sess = tf.Session()
@@ -23,25 +33,25 @@ class Anfis:
         self.a_0 = tf.get_variable(name="a_0", dtype=tf.float32,
                                    initializer=tf.ones(shape=(self.num_rules, 1)), trainable=1)
         self.a_y = tf.get_variable(name="a_y", dtype=tf.float32,
-                                   initializer=tf.ones(shape=(self.num_rules, num_inputs)), trainable=1)
+                                   initializer=tf.ones(shape=(self.num_rules, self.num_inputs)), trainable=1)
 
         self.sess.run(self.a_0.initializer)
         self.sess.run(self.a_y.initializer)
         #
-        self.var = [[None] * num_sets] * num_inputs
+        self.var = [[None] * num_sets] * self.num_inputs
 
         # Saver to export graph(model)
         self.saver = tf.train.Saver()
 
         # input variable
-        self.x = tf.placeholder(name="x", shape=[num_inputs], dtype=tf.float32)
+        self.x = tf.placeholder(name="x", shape=[self.num_inputs], dtype=tf.float32)
         tf.add_to_collection("xVar", self.x)
         # expected result
         self.y = tf.placeholder(name="y", shape=(), dtype=tf.float32)
         tf.add_to_collection("yVar", self.y)
 
         # First Hidden Layer
-        self.mf = [None]*self.num_rules
+        self.mf = [None] * self.num_rules
         # self.member_func(mf_param)
         self.mfs()
 
@@ -82,7 +92,7 @@ class Anfis:
         # dividend_right = tf.subtract(b, x)
         # dividor_right = tf.subtract(b, m)
         dividend_right = tf.subtract(par[2], x)
-        dividor_right= tf.subtract(par[2], par[1])
+        dividor_right = tf.subtract(par[2], par[1])
         min_right = tf.divide(dividend_right, dividor_right)
 
         min_func = tf.minimum(min_left, min_right)
@@ -163,90 +173,50 @@ class Anfis:
     # def plot(self):
 
     def mfs(self):
-        num_mfs = self.num_sets*self.num_inputs
+        num_mfs = self.num_sets * self.num_inputs
         premisses = [[None] * self.num_sets] * self.num_inputs
 
-        a = [[None] * self.num_sets] * self.num_inputs
         m = [[None] * self.num_sets] * self.num_inputs
-        b = [[None] * self.num_sets] * self.num_inputs
 
-        val_inc = (self.range[1] - self.range[0]) / (num_mfs * 3)
+        val_inc = (self.range[1] - self.range[0]) / ((self.num_sets * 3))
 
-        index = 0
+        ind = 0
 
         for i in range(self.num_inputs):
+
+            ind = 0
             for f in range(self.num_sets):
-
-                # a_val = npr.uniform(self.range[0], self.range[1])
-                # print(a_val)
-                # m_val = npr.uniform(a_val, self.range[1])
-                # b_val = npr.uniform(m_val, self.range[1])
-                # print((self.num_sets*i + f + index)*val_inc)
-                # print((self.num_sets*i + f + index + 2)*val_inc)
-                # print((self.num_sets*i + f + index + 3)*val_inc)
-                # with tf.variable_scope("mf_for_inp" + str(i + 1))
-                if((self.num_sets*i + f) == 0):
-                    a[i][f] = tf.get_variable(name="a" + str((self.num_sets*i + f) + 1), dtype=tf.float32, trainable=0,
-                                              initializer=tf.constant((self.num_sets*i + f + index)*val_inc))
-                else: #(self.num_sets*i + f + index)*val_inc
-                    a[i][f] = tf.get_variable(name="a" + str((self.num_sets*i + f) + 1), dtype=tf.float32,
-                                                  trainable=1, initializer=tf.constant((self.num_sets*i + f + index)*val_inc - 0.5))
-                    # (self.num_sets*i + f + index + 2)*val_inc
-                m[i][f] = tf.get_variable(name="m"+str((self.num_sets*i + f) + 1), dtype=tf.float32, trainable=1,
-                                              initializer=tf.constant((self.num_sets*i + f + index + 2)*val_inc))
-
-                if((self.num_sets*i + f) == (num_mfs - 1)):
-                    b[i][f] = tf.get_variable(name="b"+str((self.num_sets*i + f) + 1), dtype=tf.float32,
-                                        initializer=tf.constant(self.range[1]*1.0), trainable=0)
+                if f == 0:
+                    a = tf.get_variable(initializer=tf.constant(self.range[0] * 1.0), name="a" + str(i) + str(f),
+                                        dtype=tf.float32, trainable=0)
                 else:
-                # (self.num_sets * i + f + index + 3) * val_inc
-                    b[i][f] = tf.get_variable(name="b" + str((self.num_sets*i + f) + 1), dtype=tf.float32,
-                                          trainable=1,
-                                          initializer=tf.constant((self.num_sets*i + f + index + 3)*val_inc))
+                    a = tf.get_variable(initializer=tf.constant((f + ind - 2) * val_inc),
+                                        name="a" + str(i) + str(f),
+                                        dtype=tf.float32)
+                ind += 1
 
-                # if(f == self.num_sets - 1):
-                #     m_clip = tf.clip_by_value(b[i][f], m[i][f], a[i+1][f])
+                # if(f == 0):
+                #     m = tf.get_variable(name="m" + str(i) + str(f), dtype=tf.float32, trainable=1,
+                #                         initializer=tf.constant(2 * val_inc))
                 # else:
-                m_clip = tf.clip_by_value(m[i][f], a[i][f], b[i][f])
+                m = tf.get_variable(name="m" + str(i) + str(f), dtype=tf.float32, trainable=1,
+                                    initializer=tf.constant((f + ind) * val_inc))
 
+                ind += 1
 
-                index += 2
-                # if ((self.num_sets*i + f) == 0):
-                #     self.var[i][f] = tf.get_variable(name="a" + str((self.num_sets*i + f) + 1), dtype=tf.float32,
-                #                                      initializer=tf.constant(self.range[0]*1.0), trainable=0),\
-                #                      tf.get_variable(name="m"+str((self.num_sets*i + f) + 1), dtype=tf.float32,
-                #                                      initializer=tf.constant(m_val), trainable=1), \
-                #                      tf.get_variable(name="b"+str((self.num_sets*i + f) + 1), dtype=tf.float32,
-                #                                      initializer=tf.constant(b_val), trainable=1)
-                # elif ((self.num_sets*i + f) == (num_mfs - 1)):
-                #     self.var[i][f] = tf.get_variable(name="a" + str((self.num_sets*i + f) + 1), dtype=tf.float32,
-                #                                      initializer=tf.constant(npr.uniform(self.range[0], self.range[1])), trainable=1), \
-                #                      tf.get_variable(name="m" + str((self.num_sets * i + f) + 1), dtype=tf.float32,
-                #                                      initializer=tf.constant(m_val), trainable=1), \
-                #                      tf.get_variable(name="b" + str((self.num_sets * i + f) + 1), dtype=tf.float32,
-                #                                      initializer=tf.constant(self.range[1] * 1.0), trainable=0)
-                # else:
-                #     self.var[i][f] = tf.get_variable(name="a" + str((self.num_sets*i + f) + 1), dtype=tf.float32,
-                #                                      initializer=tf.constant(a_val), trainable=1), \
-                #                      tf.get_variable(name="m" + str((self.num_sets * i + f) + 1), dtype=tf.float32,
-                #                                      initializer=tf.constant(m_val), trainable=1), \
-                #                      tf.get_variable(name="b" + str((self.num_sets * i + f) + 1), dtype=tf.float32,
-                #                                      initializer=tf.constant(b_val), trainable=1)
-                self.var[i][f] = a[i][f], m[i][f], b[i][f]
-                print("Input Index:", i, "Set Index:", f, self.var[i][f])
+                if (self.num_sets * i + f) == (num_mfs - 1):
+                    b = tf.get_variable(name="b" + str(i) + str(f), dtype=tf.float32,
+                                        initializer=tf.constant(self.range[1] * 1.0), trainable=0)
+                else:
+                    b = tf.get_variable(name="b" + str(i) + str(f), dtype=tf.float32,
+                                        trainable=1,
+                                        initializer=tf.constant((f + ind) * val_inc))
 
-                # print("A", i, f, ":", self.sess.run(a[i][f]))
-                # print("M", i, f, ":", self.sess.run(m[i][f]))
-                # print("B", i, f, ":", self.sess.run(b[i][f]))
+                self.var[i][f] = a, m, b
 
-                # print(self.sess.run(self.var[i][f]))
+                premisses[i][f] = self.triangularMF(self.x[i], self.var[i][f], "test_mf" + str(i) + str(f))
 
-                # print("Variable a for mf", (self.num_sets*i + f), ":", self.sess.run(a[i][f]))
-
-                premisses[i][f] = self.triangularMF(self.x[i], self.var[i][f], "test_mf" + str((i+1)*(f+1)))
         index = 0
-
-        # print(tf.Session().run(premisses))
         for perm in it.product(range(self.num_sets), repeat=(self.num_inputs)):
             tmp = tf.ones(shape=(), dtype=tf.float32)
             for i in range(len(perm)):
@@ -254,15 +224,9 @@ class Anfis:
             self.mf[index] = tmp
             index += 1
 
-
-        # inis = tf.global_variables_initializer()
-        # self.sess.run(inis)
-        # print(self.sess.run(a[1][0]))
-
     def all_variables(self):
         return tf.global_variables()
 
     def secondLayer(self):
 
         pass
-

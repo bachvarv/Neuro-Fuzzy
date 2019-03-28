@@ -9,17 +9,21 @@ from ANFIS.anfis import Anfis
 
 a = [[0.0, 3.0, 5.5], [4.5, 7.0, 10.0]]
 
-num_rules = 2
+# num_rules = 2
 
 num_inputs = 1
 
-num_sets = 6
+mat = [[1, 2]]
+
+num_sets = 1
 
 num_conclusions = 2
 
-mat = [[1, 2]]
+# mat = [[1, 2]]
 
-f = Anfis(range=[0.0, 10.0], num_inputs=num_inputs, num_sets=num_sets)
+# f = Anfis(range=[0.0, 10.0], num_inputs=num_inputs, num_sets=num_sets)
+
+f = Anfis(range=[0.0, 10.0], mat=mat, num_sets=num_sets)
 
 # for i in a:
 #     print(i)
@@ -109,15 +113,15 @@ with f.sess as sess:
 
     plt.figure(figsize=(8.5, 5))
 
-    while(x < 9.0):
+    while (x < 10.0):
         x_val.append(x)
-        y_val.append(x * x)
+        y_val.append(2 * x)
         x = x + 0.5
         index += 1
 
     plt.plot(x_val, y_val, linestyle=':')
 
-    epochs = 2000
+    epochs = 5000
     for _ in range(epochs):
         # does work but doesn't seem to change the value of the variables
         # it does not work because the loss function doesn't calculate the right value for errors,
@@ -125,7 +129,7 @@ with f.sess as sess:
         # if uniform(0, 1) <= 0.5:
         candidate = uniform(0.5, 10.0)
         candidate_2 = uniform(0.5, 9.0)
-        y = (candidate * candidate)
+        y = (2 * candidate)
         # else:
         #     candidate = uniform(6.0, 9.8)
         #     # print("Candidate:", candidate, "; Erwarteter Resultat", y)
@@ -150,9 +154,9 @@ with f.sess as sess:
         print("Fehlerrate für", candidate, ":", f.train(sess, x, y))
         print("-----------------------------------------------------")
 
-        print("a_0",  sess.run(f.a_0))
-        print("a_y:",  sess.run(f.a_y))
-        print("MFs:", sess.run(f.var))
+        # print("a_0", sess.run(f.a_0))
+        # print("a_y:", sess.run(f.a_y))
+        # print("MFs:", sess.run(f.var))
     # with tf.variable_scope("") as scope:
     #     scope.reuse_variables()
     #     a1 = tf.get_variable("a1")
@@ -181,8 +185,9 @@ with f.sess as sess:
     # save the graph for export
     # f.save_graph(sess, "model", 1000)
 
-    plt.legend(loc='upper left', labels = ["f(x)", "y°(x1)"])
+    plt.legend(loc='upper left', labels=["f(x)", "y°(x1)"])
     # plt.savefig('../graphics/firstgraphics/' + str(epochs)+'_epochs.png')
+
     plt.show()
 
     # save the model in a file, which can be opened through tensorboard
