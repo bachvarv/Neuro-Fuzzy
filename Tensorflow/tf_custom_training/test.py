@@ -11,11 +11,11 @@ a = [[0.0, 3.0, 5.5], [4.5, 7.0, 10.0]]
 
 # num_rules = 2
 
-num_inputs = 1
+num_inputs = 2
 
-mat = [[1, 2]]
+mat = [[1, 2, 3]]
 
-num_sets = 1
+num_sets = 4
 
 num_conclusions = 2
 
@@ -121,7 +121,7 @@ with f.sess as sess:
 
     plt.plot(x_val, y_val, linestyle=':')
 
-    epochs = 5000
+    epochs = 0
     for _ in range(epochs):
         # does work but doesn't seem to change the value of the variables
         # it does not work because the loss function doesn't calculate the right value for errors,
@@ -176,11 +176,11 @@ with f.sess as sess:
     # my_labels = ['f(x)= x^2', 'f(x)= ' + str(a_0[0][0]) + ' + ' + str(a_y[0][0])
     #              + ' * x and f(x)= ' + str(a_0[1][0]) + ' + ' + str(a_y[1][0]) + ' * x']
 
-    for i in range(len(x_val)):
-        # print(f.doCalculation(sess, [x_val[i]]))
-        y_out.append(f.doCalculation(sess, [x_val[i]]))
+    # for i in range(len(x_val)):
+    #     # print(f.doCalculation(sess, [x_val[i]]))
+    #     y_out.append(f.doCalculation(sess, [x_val[i]]))
 
-    plt.plot(x_val, y_out, alpha=0.5, linestyle='--')
+    # plt.plot(x_val, y_out, alpha=0.5, linestyle='--')
 
     # save the graph for export
     # f.save_graph(sess, "model", 1000)
