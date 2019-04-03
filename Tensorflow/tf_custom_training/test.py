@@ -1,21 +1,30 @@
 from random import uniform
 import matplotlib.pyplot as plt
+import numpy as np
+
+from utils.data_generation import genDataSetWithNoise
 
 import tensorflow as tf
 
 from ANFIS.anfis import Anfis
 
-# lineare funktion y' = a0 + a1*x0
+x_data, y_data, w_real, b_real, noise = genDataSetWithNoise(1, 2000)
 
-a = [[0.0, 3.0, 5.5], [4.5, 7.0, 10.0]]
+trn_dataX = x_data[:1500, :]
+trn_dataY = y_data[:, :1500]
 
-# num_rules = 2
+chk_dataX = x_data[-501:, :]
+chk_dataY = y_data[:, -501:]
+
+# chk_data = np.concatenate((chk_dataX, chk_dataY), axis=1)
+
+print(chk_dataX[0], chk_dataY)
 
 num_inputs = 2
 
-mat = [[1, 2, 3]]
+mat = [[3]]
 
-num_sets = 4
+num_sets = 2
 
 num_conclusions = 2
 
@@ -23,7 +32,7 @@ num_conclusions = 2
 
 # f = Anfis(range=[0.0, 10.0], num_inputs=num_inputs, num_sets=num_sets)
 
-f = Anfis(range=[0.0, 10.0], mat=mat, num_sets=num_sets)
+f = Anfis(range=[-6.0, 6.0], mat=mat, num_sets=num_sets)
 
 # for i in a:
 #     print(i)
@@ -109,27 +118,33 @@ with f.sess as sess:
     y_out = []
 
     x = 0.5
+    z = 0.5
     index = 0
 
     plt.figure(figsize=(8.5, 5))
 
-    while (x < 10.0):
-        x_val.append(x)
-        y_val.append(2 * x)
-        x = x + 0.5
-        index += 1
+    # while (x < 10.0):
+    #     x_val.append([x, z])
+    #     y_val.append(x * x + z)
+    #     x = x + 0.5
+    #     z = z + 0.5
+    #     index += 1
 
-    plt.plot(x_val, y_val, linestyle=':')
+    for i in range(len(chk_dataX)):
+        x_val.append(chk_dataX[i])
+        y_val.append(chk_dataY[0][i])
 
-    epochs = 0
-    for _ in range(epochs):
+    plt.scatter(x_val, y_val,)
+
+    epochs = len(trn_dataX)
+    for i in range(epochs):
         # does work but doesn't seem to change the value of the variables
         # it does not work because the loss function doesn't calculate the right value for errors,
         # when a candidate is beyond the mf's range.
         # if uniform(0, 1) <= 0.5:
         candidate = uniform(0.5, 10.0)
         candidate_2 = uniform(0.5, 9.0)
-        y = (2 * candidate)
+        y = (candidate * candidate)
         # else:
         #     candidate = uniform(6.0, 9.8)
         #     # print("Candidate:", candidate, "; Erwarteter Resultat", y)
@@ -148,10 +163,10 @@ with f.sess as sess:
         # print("Output1:", sess.run(f.outputs, feed_dict={f.x: x}))
         # print("Conclussions:", sess.run(f.conclussions, feed_dict={f.x: x}))
 
-        print("Kandidat:", x, ";Erwarteter Resultat:", y, "; das Model ratet:", f.doCalculation(sess, x))
+        print("Kandidat:", trn_dataX[i], ";Erwarteter Resultat:", trn_dataY[0][i], "; das Model ratet:", f.doCalculation(sess, trn_dataX[i]))
         # print("TEST2: input:", candidate, sess.run(f.result, feed_dict={f.x: x}))
 
-        print("Fehlerrate für", candidate, ":", f.train(sess, x, y))
+        print("Fehlerrate für", candidate, ":", f.train(sess, trn_dataX[i], trn_dataY[0][i]))
         print("-----------------------------------------------------")
 
         # print("a_0", sess.run(f.a_0))
@@ -176,11 +191,17 @@ with f.sess as sess:
     # my_labels = ['f(x)= x^2', 'f(x)= ' + str(a_0[0][0]) + ' + ' + str(a_y[0][0])
     #              + ' * x and f(x)= ' + str(a_0[1][0]) + ' + ' + str(a_y[1][0]) + ' * x']
 
-    # for i in range(len(x_val)):
-    #     # print(f.doCalculation(sess, [x_val[i]]))
-    #     y_out.append(f.doCalculation(sess, [x_val[i]]))
+    for i in range(len(chk_dataX)):
+        # print(f.doCalculation(sess, [x_val[i]]))
+        y_out.append(f.doCalculation(sess, chk_dataX[i]))
 
-    # plt.plot(x_val, y_out, alpha=0.5, linestyle='--')
+    plt.scatter(chk_dataX, y_out, color='red')
+
+    # plt.plot(chk_dataX, y_out, color='red', alpha=0.5)
+
+    # loss, result = f.testModell(sess, chk_dataY)
+
+    # print(loss, result)
 
     # save the graph for export
     # f.save_graph(sess, "model", 1000)

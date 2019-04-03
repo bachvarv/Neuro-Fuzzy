@@ -1,21 +1,20 @@
-import os
-
 import tensorflow as tf
-import numpy.random as npr
 import itertools as it
 
-dir = os.path.dirname(os.path.realpath(__file__))
+from utils.array_utils import buildTestData
 
 
 class Anfis:
     # num_inputs is not being used. trying the simple way of calculating
     def __init__(self, num_sets, range, mat=None, num_inputs=None):
         self.num_sets = num_sets
-
+        self.test_possible = False
         # Last index of an array is the expected value.
         # mat array is an array wich contains all the test data.
         if (mat != None):
-            self.num_inputs = len(mat[0]) - 1
+            self.num_inputs = len(mat[0])
+            # self.xArr, self.yArr = buildTestData(mat)
+            self.test_possible = True
         elif (num_inputs != None):
             self.num_inputs = num_inputs
         else:
@@ -58,7 +57,7 @@ class Anfis:
         # Hidden Layers 2 and 3
         self.normalizedMFs = None
         self.reshaped_mfs = None
-        self.secondLayer()
+        # self.secondLayer()
         self.normLayer_reshaped()
 
         # Output functions
@@ -178,21 +177,26 @@ class Anfis:
 
         m = [[None] * self.num_sets] * self.num_inputs
 
-        val_inc = (self.range[1] - self.range[0]) / ((self.num_sets * 3))
+        val_inc = abs((self.range[1] - self.range[0])) / ((self.num_sets * 3) - 1)
+
+        print(abs((self.range[1] - self.range[0])))
 
         ind = 0
 
         for i in range(self.num_inputs):
 
             ind = 0
+            val = self.range[0]
             for f in range(self.num_sets):
                 if f == 0:
                     a = tf.get_variable(initializer=tf.constant(self.range[0] * 1.0), name="a" + str(i) + str(f),
                                         dtype=tf.float32, trainable=0)
                 else:
-                    a = tf.get_variable(initializer=tf.constant((f + ind - 2) * val_inc),
+                    a = tf.get_variable(initializer=tf.constant(val - 2 * val_inc),
                                         name="a" + str(i) + str(f),
                                         dtype=tf.float32)
+
+                val = val + val_inc
                 ind += 1
 
                 # if(f == 0):
@@ -200,7 +204,9 @@ class Anfis:
                 #                         initializer=tf.constant(2 * val_inc))
                 # else:
                 m = tf.get_variable(name="m" + str(i) + str(f), dtype=tf.float32, trainable=1,
-                                    initializer=tf.constant((f + ind) * val_inc))
+                                    initializer=tf.constant(val))
+
+                val = val + val_inc
 
                 ind += 1
 
@@ -210,7 +216,9 @@ class Anfis:
                 else:
                     b = tf.get_variable(name="b" + str(i) + str(f), dtype=tf.float32,
                                         trainable=1,
-                                        initializer=tf.constant((f + ind) * val_inc))
+                                        initializer=tf.constant(val))
+
+                val = val + val_inc
 
                 self.var[i][f] = a, m, b
 
@@ -227,6 +235,6 @@ class Anfis:
     def all_variables(self):
         return tf.global_variables()
 
-    def secondLayer(self):
+    def testModell(self, sess, x_data, y_data):
 
-        pass
+            return sess.run([self.loss, self.result], feed_dict={self.x: x_data, self.y: y_data})
