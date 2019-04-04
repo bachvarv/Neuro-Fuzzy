@@ -12,6 +12,7 @@ class Anfis:
         # mat array is an array wich contains all the test data.
         if (mat != None):
             self.num_inputs = len(mat[0])
+
             self.test_possible = True
         elif (num_inputs != None):
             self.num_inputs = num_inputs
