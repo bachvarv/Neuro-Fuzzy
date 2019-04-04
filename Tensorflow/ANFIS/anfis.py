@@ -1,7 +1,6 @@
 import tensorflow as tf
 import itertools as it
 
-from utils.array_utils import buildTestData
 
 
 class Anfis:

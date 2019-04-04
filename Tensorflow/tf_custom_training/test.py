@@ -115,6 +115,7 @@ with f.sess as sess:
     # print("Reshaped Outputs:", sess.run(f.y_funcs, feed_dict={f.x: [[3.3]]}))
     x_val = []
     y_val = []
+    y_before_trn = []
     y_out = []
 
     x = 0.5
@@ -133,8 +134,11 @@ with f.sess as sess:
     for i in range(len(chk_dataX)):
         x_val.append(chk_dataX[i])
         y_val.append(chk_dataY[0][i])
+        y_before_trn.append(f.doCalculation(sess, chk_dataX[i]))
 
-    plt.scatter(x_val, y_val,)
+    plt.scatter(x_val, y_val, color='blue')
+
+    plt.scatter(x_val, y_before_trn, color='green', alpha=0.5)
 
     epochs = len(trn_dataX)
     for i in range(epochs):
@@ -163,7 +167,8 @@ with f.sess as sess:
         # print("Output1:", sess.run(f.outputs, feed_dict={f.x: x}))
         # print("Conclussions:", sess.run(f.conclussions, feed_dict={f.x: x}))
 
-        print("Kandidat:", trn_dataX[i], ";Erwarteter Resultat:", trn_dataY[0][i], "; das Model ratet:", f.doCalculation(sess, trn_dataX[i]))
+        print("Kandidat:", trn_dataX[i], ";Erwarteter Resultat:", trn_dataY[0][i], "; das Model ratet:",
+              f.doCalculation(sess, trn_dataX[i]))
         # print("TEST2: input:", candidate, sess.run(f.result, feed_dict={f.x: x}))
 
         print("Fehlerrate für", candidate, ":", f.train(sess, trn_dataX[i], trn_dataY[0][i]))
@@ -195,7 +200,7 @@ with f.sess as sess:
         # print(f.doCalculation(sess, [x_val[i]]))
         y_out.append(f.doCalculation(sess, chk_dataX[i]))
 
-    plt.scatter(chk_dataX, y_out, color='red')
+    plt.scatter(chk_dataX, y_out, color='red', alpha=0.5)
 
     # plt.plot(chk_dataX, y_out, color='red', alpha=0.5)
 
@@ -206,7 +211,8 @@ with f.sess as sess:
     # save the graph for export
     # f.save_graph(sess, "model", 1000)
 
-    plt.legend(loc='upper left', labels=["f(x)", "y°(x1)"])
+    plt.legend(loc='upper left',
+               labels=["Erwartete Werte", "Ergebnisse vor dem Training", "Ergebnisse nach dem Training"])
     # plt.savefig('../graphics/firstgraphics/' + str(epochs)+'_epochs.png')
 
     plt.show()
