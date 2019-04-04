@@ -114,3 +114,5 @@ all_files.*
 checkpoint
 model-1000.*
 my_test_model.*
+test_package/
+

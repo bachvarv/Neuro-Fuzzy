@@ -1,64 +1,69 @@
-from random import uniform, random
+from random import uniform
+import matplotlib.pyplot as plt
+import numpy as np
 
-from tensorflow.python import debug as tf_debug
+from utils.data_generation import genDataSetWithNoise
 
 import tensorflow as tf
 
 from ANFIS.anfis import Anfis
 
-# lineare funktion y' = a0 + a1*x0
+x_data, y_data, w_real, b_real, noise = genDataSetWithNoise(1, 2000)
 
-a = [[0.0, 3.0, 5.5], [4.5, 7.0, 10.0]]
+trn_dataX = x_data[:1500, :]
+trn_dataY = y_data[:, :1500]
 
-num_rules = 2
+chk_dataX = x_data[-501:, :]
+chk_dataY = y_data[:, -501:]
 
-num_inputs = 1
+# chk_data = np.concatenate((chk_dataX, chk_dataY), axis=1)
+
+print(chk_dataX[0], chk_dataY)
+
+num_inputs = 2
+
+mat = [[3]]
+
+num_sets = 2
 
 num_conclusions = 2
 
-f = Anfis(mf_param=a, num_inputs=num_inputs, num_rules=num_rules)
+# mat = [[1, 2]]
 
-for i in a:
-    print(i)
+# f = Anfis(range=[0.0, 10.0], num_inputs=num_inputs, num_sets=num_sets)
 
-with tf.variable_scope("") as scope:
-    scope.reuse_variables()
-    a1 = tf.get_variable("a1", [])
-    m1 = tf.get_variable("m1", [])
-    b1 = tf.get_variable("b1", [])
+f = Anfis(range=[-6.0, 6.0], mat=mat, num_sets=num_sets)
 
-# mfs = tf.reshape(f.normalizedMFs, shape=[])
+# for i in a:
+#     print(i)
 
+# f.mfs()
 
-# f.outputTensor(0, tf.multiply(f.x, 2.0))
-# f.outputTensor(1, tf.divide(f.x, 2.))
-
-# FIXME:
-# f.normLayer()
-# f.outputLayer(num_rules, num_inputs)
-
-# print(f.mf[0])
-#
-# print(f.outputs[1])
-
-
-
-# initializer = f.getVariableInitializer()
-
-# with tf.variable_scope("mfs") as scope:
-#     scope.reuse_variables()
-#     mf1 = tf.get_variable("mf1", [])
-
-with tf.Session() as sess:
+with f.sess as sess:
     # sess = tf_debug.TensorBoardDebugWrapperSession(sess, "bachvarv:6064")
 
     # writer = tf.summary.FileWriter("output_test", graph=sess.graph)
 
+    # uninitialized_vars = []
+    # for var in f.all_variables():
+    #     try:
+    #        sess.run(var)
+    #     except tf.errors.FailedPreconditionError:
+    #         print(var)
+    #         uninitialized_vars.append(var)
+    #
+    # init_new_vars_op =  tf.variables_initializer(uninitialized_vars)
     sess.run(f.getVariableInitializer())
+    #
+    print(sess.run(f.var))
+    # print("Aktivierungswerte:", sess.run(f.rules_arr, feed_dict={f.x: [2.3]}))
+    # print("Zugehörigkeitsfunktionen:", sess.run(f.premisses, feed_dict={f.x: [2.3]}))
+    # print(f.rules_arr)
 
     # print("Result of MF1:", sess.run(f.mf[0], feed_dict={f.x: [2.3]}))
     # print("Result of MF2:", sess.run(f.mf[1], feed_dict={f.x: [2.3]}))
     # print("Result of both MFS:", sess.run(f.mf, feed_dict={f.x: [2.3]}))
+    # print(f.mf)
     #
     # print("Reshaped MFs", sess.run(f.reshaped_mfs, feed_dict={f.x: [2.3]}))
     #
@@ -108,54 +113,109 @@ with tf.Session() as sess:
     # print("Outputs", sess.run(f.outputs, feed_dict={f.x: [[3.3]]}))
     # print("Reshaped:", sess.run(f.reshaped_nmfs, feed_dict={f.x: [[3.3]]}))
     # print("Reshaped Outputs:", sess.run(f.y_funcs, feed_dict={f.x: [[3.3]]}))
+    x_val = []
+    y_val = []
+    y_before_trn = []
+    y_out = []
 
-    for _ in range(10000):
+    x = 0.5
+    z = 0.5
+    index = 0
+
+    plt.figure(figsize=(8.5, 5))
+
+    # while (x < 10.0):
+    #     x_val.append([x, z])
+    #     y_val.append(x * x + z)
+    #     x = x + 0.5
+    #     z = z + 0.5
+    #     index += 1
+
+    for i in range(len(chk_dataX)):
+        x_val.append(chk_dataX[i])
+        y_val.append(chk_dataY[0][i])
+        y_before_trn.append(f.doCalculation(sess, chk_dataX[i]))
+
+    plt.scatter(x_val, y_val, color='blue')
+
+    plt.scatter(x_val, y_before_trn, color='green', alpha=0.5)
+
+    epochs = len(trn_dataX)
+    for i in range(epochs):
         # does work but doesn't seem to change the value of the variables
         # it does not work because the loss function doesn't calculate the right value for errors,
         # when a candidate is beyond the mf's range.
         # if uniform(0, 1) <= 0.5:
-        candidate = uniform(0.5, 9.0)
-        y = candidate * candidate
+        candidate = uniform(0.5, 10.0)
+        candidate_2 = uniform(0.5, 9.0)
+        y = (candidate * candidate)
         # else:
         #     candidate = uniform(6.0, 9.8)
         #     # print("Candidate:", candidate, "; Erwarteter Resultat", y)
         #     y = 0.5 * candidate
         #     print("Candidate:", candidate, "; Erwarteter Resultat", y)
         x = [candidate]
+        # cands.append(candidate)
 
-        print("-----------------------------------------------------")
-        print("Candidate:", candidate, "; Erwarteter Resultat:", y)
-
-        print("MF0:", sess.run(f.mf[0], feed_dict={f.x: x}))
-        print("MF1:", sess.run(f.mf[1], feed_dict={f.x: x}))
-        print("Summ of MF'S:", sess.run(f.mf, feed_dict={f.x: x}))
-        print("NMF0:", sess.run(f.normalizedMFs, feed_dict={f.x: x}))
+        # print("Candidate:", candidate, "; Erwarteter Resultat:", y)
+        #
+        # print("MF0:", sess.run(f.mf[0], feed_dict={f.x: x}))
+        # print("MF1:", sess.run(f.mf[1], feed_dict={f.x: x}))
+        # print("Summ of MF'S:", sess.run(f.mf, feed_dict={f.x: x}))
+        # print("NMF0:", sess.run(f.normalizedMFs, feed_dict={f.x: x}))
         # print("NMF1:", sess.run(f.normalizedMFs[1][0], feed_dict={f.x: x}))
-        print("Output1:", sess.run(f.outputs, feed_dict={f.x: x}))
-        print("Conclussions:", sess.run(f.conclussions, feed_dict={f.x: x}))
+        # print("Output1:", sess.run(f.outputs, feed_dict={f.x: x}))
+        # print("Conclussions:", sess.run(f.conclussions, feed_dict={f.x: x}))
 
-        print("TEST1: input:", candidate, f.doCalculation(sess, x))
-        print("TEST2: input:", candidate, sess.run(f.result, feed_dict={f.x: x}))
+        print("Kandidat:", trn_dataX[i], ";Erwarteter Resultat:", trn_dataY[0][i], "; das Model ratet:",
+              f.doCalculation(sess, trn_dataX[i]))
+        # print("TEST2: input:", candidate, sess.run(f.result, feed_dict={f.x: x}))
 
-        print("Train Step:", f.train(sess, x, y))
+        print("Fehlerrate für", candidate, ":", f.train(sess, trn_dataX[i], trn_dataY[0][i]))
         print("-----------------------------------------------------")
-    with tf.variable_scope("") as scope:
-        scope.reuse_variables()
-        a1 = tf.get_variable("a1")
-        m1 = tf.get_variable("m1")
-        b1 = tf.get_variable("b1")
-        a2 = tf.get_variable("a2")
-        m2 = tf.get_variable("m2")
-        b2 = tf.get_variable("b2")
 
-    print(sess.run(a1))
+        # print("a_0", sess.run(f.a_0))
+        # print("a_y:", sess.run(f.a_y))
+        # print("MFs:", sess.run(f.var))
+    # with tf.variable_scope("") as scope:
+    #     scope.reuse_variables()
+    #     a1 = tf.get_variable("a1")
+    #     m1 = tf.get_variable("m1")
+    #     b1 = tf.get_variable("b1")
+    #     a2 = tf.get_variable("a2")
+    #     m2 = tf.get_variable("m2")
+    #     b2 = tf.get_variable("b2")
 
-    print(sess.run(f.var))
-    print("Self prims:")
-    print(sess.run(f.a_y))
-    print(sess.run(f.a_0))
-    print("------------------------------------------")
-    #
+    # print(sess.run(a1))
+    a_y = sess.run(f.a_y)
+    a_0 = sess.run(f.a_0)
+    print("MFs:", sess.run(f.var))
+    print("a_0", a_0)
+    print("a_y:", a_y)
+
+    # my_labels = ['f(x)= x^2', 'f(x)= ' + str(a_0[0][0]) + ' + ' + str(a_y[0][0])
+    #              + ' * x and f(x)= ' + str(a_0[1][0]) + ' + ' + str(a_y[1][0]) + ' * x']
+
+    for i in range(len(chk_dataX)):
+        # print(f.doCalculation(sess, [x_val[i]]))
+        y_out.append(f.doCalculation(sess, chk_dataX[i]))
+
+    plt.scatter(chk_dataX, y_out, color='red', alpha=0.5)
+
+    # plt.plot(chk_dataX, y_out, color='red', alpha=0.5)
+
+    # loss, result = f.testModell(sess, chk_dataY)
+
+    # print(loss, result)
+
+    # save the graph for export
     # f.save_graph(sess, "model", 1000)
 
+    plt.legend(loc='upper left',
+               labels=["Erwartete Werte", "Ergebnisse vor dem Training", "Ergebnisse nach dem Training"])
+    # plt.savefig('../graphics/firstgraphics/' + str(epochs)+'_epochs.png')
+
+    plt.show()
+
+    # save the model in a file, which can be opened through tensorboard
     # writer.close()
