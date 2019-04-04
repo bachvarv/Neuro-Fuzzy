@@ -12,7 +12,6 @@ class Anfis:
         # mat array is an array wich contains all the test data.
         if (mat != None):
             self.num_inputs = len(mat[0])
-            # self.xArr, self.yArr = buildTestData(mat)
             self.test_possible = True
         elif (num_inputs != None):
             self.num_inputs = num_inputs
@@ -80,15 +79,11 @@ class Anfis:
 
     def triangularMF(self, x, par, name):
         # min_left = (x - a1) / (m1 - a1)
-        # dividend = tf.subtract(x, a)
-        # dividor = tf.subtract(m, a)
         dividend = tf.subtract(x, par[0])
         dividor = tf.subtract(par[1], par[0])
         min_left = tf.divide(dividend, dividor)
 
         # min_right = (b1 - x) / (b1 - m1)
-        # dividend_right = tf.subtract(b, x)
-        # dividor_right = tf.subtract(b, m)
         dividend_right = tf.subtract(par[2], x)
         dividor_right = tf.subtract(par[2], par[1])
         min_right = tf.divide(dividend_right, dividor_right)
@@ -111,32 +106,6 @@ class Anfis:
         self.summ = tf.reduce_sum(self.outputs)
         self.optimizeMethod()
 
-    # def member_func(self, mf_param=None):
-    #     index = 1
-    #     if len(mf_param) > 0:
-    #         for i in mf_param:
-    #             if(index == 1):
-    #                 a = tf.get_variable(name="a"+str(index), dtype=tf.float32,
-    #                                     initializer=tf.constant(i[0]), trainable=0)
-    #             else:
-    #                 a = tf.get_variable(name="a" + str(index), dtype=tf.float32,
-    #                                     initializer=tf.constant(i[0]), trainable=1)
-    #             m = tf.get_variable(name="m"+str(index), dtype=tf.float32, initializer=tf.constant(i[1]), trainable=1)
-    #
-    #             if(index == len(mf_param)):
-    #                 b = tf.get_variable(name="b"+str(index), dtype=tf.float32,
-    #                                     initializer=tf.constant(i[2]), trainable=0)
-    #             else:
-    #                 b = tf.get_variable(name="b" + str(index), dtype=tf.float32,
-    #                                     initializer=tf.constant(i[2]), trainable=1)
-    #             self.var[index - 1] = a, m, b
-    #
-    #             with tf.variable_scope("mfs", reuse=tf.AUTO_REUSE):
-    #                 self.mf[(index - 1)] = self.triangularMF(self.x, a, m, b, ("mf" + str(index)))
-    #
-    #             index += 1
-    #         tf.add_to_collection("mf", self.var)
-
     def doCalculation(self, sess, x):
         return sess.run(self.result, feed_dict={self.x: x})
 
@@ -147,11 +116,6 @@ class Anfis:
         # self.optimizer = tf.train.GradientDescentOptimizer(learning_rate=0.01).minimize(self.loss)
         self.optimizer = tf.train.AdamOptimizer(learning_rate=0.01).minimize(self.loss)
         # self.optimizer = tf.train.RMSPropOptimizer(learning_rate=0.1).minimize(self.loss)
-
-    # überlegung wie man das am besten implementiert, sodass die Conclusionsfunction zu implementieren ist
-    # def conc_func(self, num_rules):
-    #     # for i in range(num_rules):
-    #     tf.add_to_collection("y_prims", tf.add(self.a_0, tf.multiply(self.a_y, self.x)))
 
     def getVariableInitializer(self):
         return tf.global_variables_initializer()
@@ -198,10 +162,6 @@ class Anfis:
                 val = val + val_inc
                 ind += 1
 
-                # if(f == 0):
-                #     m = tf.get_variable(name="m" + str(i) + str(f), dtype=tf.float32, trainable=1,
-                #                         initializer=tf.constant(2 * val_inc))
-                # else:
                 m = tf.get_variable(name="m" + str(i) + str(f), dtype=tf.float32, trainable=1,
                                     initializer=tf.constant(val))
 
