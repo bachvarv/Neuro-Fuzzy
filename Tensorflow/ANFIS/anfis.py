@@ -12,7 +12,7 @@ class Anfis:
         # mat array is an array wich contains all the test data.
         if (mat != None):
             self.num_inputs = len(mat[0])
-            # self.xArr, self.yArr = buildTestData(mat)
+
             self.test_possible = True
         elif (num_inputs != None):
             self.num_inputs = num_inputs
@@ -101,7 +101,6 @@ class Anfis:
         self.normalizedMFs = tf.divide(self.reshaped_mfs, tf.reduce_sum(self.reshaped_mfs))
 
     def defconclussions(self):
-
         self.conclussions = tf.add(self.a_0, tf.multiply(self.a_y, self.x), name="outputs")
 
     def outputLayer(self):
@@ -164,10 +163,6 @@ class Anfis:
                 val = val + val_inc
                 ind += 1
 
-                # if(f == 0):
-                #     m = tf.get_variable(name="m" + str(i) + str(f), dtype=tf.float32, trainable=1,
-                #                         initializer=tf.constant(2 * val_inc))
-                # else:
                 m = tf.get_variable(name="m" + str(i) + str(f), dtype=tf.float32, trainable=1,
                                     initializer=tf.constant(val))
 
