@@ -22,15 +22,15 @@ print(chk_dataX[0], chk_dataY)
 
 num_inputs = 2
 
-mat = [[3]]
+mat = [[3, 2]]
 
-num_sets = 2
+num_sets = 3
 
 num_conclusions = 2
 
 # mat = [[1, 2]]
 
-# f = Anfis(range=[0.0, 10.0], num_inputs=num_inputs, num_sets=num_sets)
+# f = Anfis(range=[0.0, 10.0], mat=mat, num_sets=num_sets)
 
 f = Anfis(range=[-6.0, 6.0], mat=mat, num_sets=num_sets)
 
@@ -125,8 +125,9 @@ with f.sess as sess:
     plt.figure(figsize=(8.5, 5))
 
     # while (x < 10.0):
-    #     x_val.append([x, z])
-    #     y_val.append(x * x + z)
+    #     x_val.append([x])
+    #     y_val.append(x * x)
+    #     y_before_trn.append(f.doCalculation(sess, [x]))
     #     x = x + 0.5
     #     z = z + 0.5
     #     index += 1
@@ -136,43 +137,53 @@ with f.sess as sess:
         y_val.append(chk_dataY[0][i])
         y_before_trn.append(f.doCalculation(sess, chk_dataX[i]))
 
+    # plt.plot(x_val, y_val, color='blue')
+
     plt.scatter(x_val, y_val, color='blue')
+
+    # plt.plot(x_val, y_before_trn, color='green', alpha=0.5)
 
     plt.scatter(x_val, y_before_trn, color='green', alpha=0.5)
 
     epochs = len(trn_dataX)
-    for i in range(epochs):
-        # does work but doesn't seem to change the value of the variables
-        # it does not work because the loss function doesn't calculate the right value for errors,
-        # when a candidate is beyond the mf's range.
-        # if uniform(0, 1) <= 0.5:
-        candidate = uniform(0.5, 10.0)
-        candidate_2 = uniform(0.5, 9.0)
-        y = (candidate * candidate)
-        # else:
-        #     candidate = uniform(6.0, 9.8)
-        #     # print("Candidate:", candidate, "; Erwarteter Resultat", y)
-        #     y = 0.5 * candidate
-        #     print("Candidate:", candidate, "; Erwarteter Resultat", y)
-        x = [candidate]
-        # cands.append(candidate)
+    for r in range(2):
+        for i in range(epochs):
+            # does work but doesn't seem to change the value of the variables
+            # it does not work because the loss function doesn't calculate the right value for errors,
+            # when a candidate is beyond the mf's range.
+            # if uniform(0, 1) <= 0.5:
+            candidate = uniform(0.5, 10.0)
+            candidate_2 = uniform(0.5, 9.0)
+            y = (candidate * candidate)
+            # else:
+            #     candidate = uniform(6.0, 9.8)
+            #     # print("Candidate:", candidate, "; Erwarteter Resultat", y)
+            #     y = 0.5 * candidate
+            #     print("Candidate:", candidate, "; Erwarteter Resultat", y)
+            x = [candidate]
+            # cands.append(candidate)
 
-        # print("Candidate:", candidate, "; Erwarteter Resultat:", y)
-        #
-        # print("MF0:", sess.run(f.mf[0], feed_dict={f.x: x}))
-        # print("MF1:", sess.run(f.mf[1], feed_dict={f.x: x}))
-        # print("Summ of MF'S:", sess.run(f.mf, feed_dict={f.x: x}))
-        # print("NMF0:", sess.run(f.normalizedMFs, feed_dict={f.x: x}))
-        # print("NMF1:", sess.run(f.normalizedMFs[1][0], feed_dict={f.x: x}))
-        # print("Output1:", sess.run(f.outputs, feed_dict={f.x: x}))
-        # print("Conclussions:", sess.run(f.conclussions, feed_dict={f.x: x}))
+            # print("Candidate:", candidate, "; Erwarteter Resultat:", y)
+            #
+            # print("MF0:", sess.run(f.mf[0], feed_dict={f.x: x}))
+            # print("MF1:", sess.run(f.mf[1], feed_dict={f.x: x}))
+            # print("Summ of MF'S:", sess.run(f.mf, feed_dict={f.x: x}))
+            # print("NMF0:", sess.run(f.normalizedMFs, feed_dict={f.x: x}))
+            # print("NMF1:", sess.run(f.normalizedMFs[1][0], feed_dict={f.x: x}))
+            # print("Output1:", sess.run(f.outputs, feed_dict={f.x: x}))
+            # print("Conclussions:", sess.run(f.conclussions, feed_dict={f.x: x}))
 
-        print("Kandidat:", trn_dataX[i], ";Erwarteter Resultat:", trn_dataY[0][i], "; das Model ratet:",
-              f.doCalculation(sess, trn_dataX[i]))
-        # print("TEST2: input:", candidate, sess.run(f.result, feed_dict={f.x: x}))
+            print("Kandidat:", trn_dataX[i], ";Erwarteter Resultat:", trn_dataY[0][i], "; das Model ratet:",
+                  f.doCalculation(sess, trn_dataX[i]))
 
-        print("Fehlerrate für", candidate, ":", f.train(sess, trn_dataX[i], trn_dataY[0][i]))
-        print("-----------------------------------------------------")
+            # print("Kandidat:", candidate, ";Erwarteter Resultat:", y, "; das Model ratet:",
+            #       f.doCalculation(sess, x))
+            # print("TEST2: input:", candidate, sess.run(f.result, feed_dict={f.x: x}))
+
+            print("Fehlerrate für", candidate, ":", f.train(sess, trn_dataX[i], trn_dataY[0][i]))
+
+            # print("Fehlerrate für", candidate, ":", f.train(sess, x, y))
+            print("-----------------------------------------------------")
 
         # print("a_0", sess.run(f.a_0))
         # print("a_y:", sess.run(f.a_y))
@@ -196,13 +207,15 @@ with f.sess as sess:
     # my_labels = ['f(x)= x^2', 'f(x)= ' + str(a_0[0][0]) + ' + ' + str(a_y[0][0])
     #              + ' * x and f(x)= ' + str(a_0[1][0]) + ' + ' + str(a_y[1][0]) + ' * x']
 
-    for i in range(len(chk_dataX)):
+    # for i in range(len(chk_dataX)):
+    for i in range(len(x_val)):
         # print(f.doCalculation(sess, [x_val[i]]))
-        y_out.append(f.doCalculation(sess, chk_dataX[i]))
+        y_out.append(f.doCalculation(sess, x_val[i]))
+        # y_out.append(f.doCalculation(sess, chk_dataX[i]))
+
+    # plt.plot(x_val, y_out, color='red', alpha=0.5)
 
     plt.scatter(chk_dataX, y_out, color='red', alpha=0.5)
-
-    # plt.plot(chk_dataX, y_out, color='red', alpha=0.5)
 
     # loss, result = f.testModell(sess, chk_dataY)
 

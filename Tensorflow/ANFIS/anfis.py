@@ -1,5 +1,6 @@
 import tensorflow as tf
 import itertools as it
+import fuzzylite as fl
 
 
 
@@ -195,5 +196,10 @@ class Anfis:
         return tf.global_variables()
 
     def testModell(self, sess, x_data, y_data):
-
             return sess.run([self.loss, self.result], feed_dict={self.x: x_data, self.y: y_data})
+
+    def mfs_test(self, name, a, b, c):
+
+        mf = tf.get_variable()
+
+        pass
