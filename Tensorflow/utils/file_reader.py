@@ -45,7 +45,7 @@ def readFile(path):
                 newline = line.replace("\n", "")
                 items = newline.split("\t")
 
-                arr = np.array(items).astype(np.float)
+                arr = np.array(items).astype(np.float64)
                 xArr[lineInd] = arr[:-1]
                 yArr[lineInd] = arr[-1]
 
@@ -54,15 +54,40 @@ def readFile(path):
 
     return xArr, yArr
 
+
 def arrays(file):
     lines = file.readlines()
     oneline = lines[0].split("\t")
-    size = len(oneline) - 1
-    anz = len(lines)
-    xArr = np.zeros(shape=(anz, size), dtype=np.float)
-    yArr = np.zeros(shape=(anz, 1), dtype=np.float)
+    column = len(oneline) - 1
+    rows = len(lines)
+    xArr = np.zeros(shape=(rows, column), dtype=np.float)
+    yArr = np.zeros(shape=(rows, 1), dtype=np.float)
     return xArr, yArr
 
+
+def range_one_input(path, index):
+    val_range = np.zeros(shape=(2), dtype=np.float)
+    lowest = np.math.inf
+    highest = -np.math.inf
+    lineInd = 0
+    with open(path, 'r') as file:
+        if file.mode == 'r':
+            line = file.readline()
+            while(line != ""):
+                newline = line.replace("\n", "")
+                items = newline.split("\t")
+
+                arr = np.array(items).astype(np.float64)
+                if(lowest > arr[index]):
+                    lowest = arr[index]
+                if(highest < arr[index]):
+                    highest = arr[index]
+                line = file.readline()
+
+        # NOTE: The amount of wiggle room for the value changes the error rate drastically
+        val_range[0] = lowest - 1e-7
+        val_range[1] = highest + 1e-7
+    return val_range
 
 
 def createFile(xArr, yArr, name):

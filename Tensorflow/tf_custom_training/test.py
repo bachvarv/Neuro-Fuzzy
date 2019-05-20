@@ -39,7 +39,7 @@ num_conclusions = 2
 # f = Anfis(range=[-3.5, 3.5], num_sets=num_sets,
 #           path="../utils/sinus.out", fulltrain=True)
 
-f = Anfis(range=[-3.5, 3.5], num_sets=num_sets,
+f = Anfis(num_sets=num_sets,
           path="../utils/sinus.out", fulltrain=True)
 
 # for i in a:
@@ -168,7 +168,7 @@ with f.sess as sess:
     # for i in epochs:
     #     print("Training Time %fs." % f.train(sess, i))
 
-    print("Training Time %fs." % f.train(sess, 50))
+    print("Training Time %fs." % f.train(sess, 10))
     # print("Fehlerrate für", candidate, ":", f.train_2(sess, trn_dataX[i], trn_dataY[0][i]))
 
     # print("Fehlerrate für", candidate, ":", f.train_2(sess, x, y))

@@ -75,3 +75,13 @@ sinus 1 Input 12 Sets 20 Epochs,45.644731568,0.25560024
 sinus 1 Input 12 Sets 50 Epochs,114.965161476,0.217336
 sinus 1 Input 13 Sets 10 Epochs,24.237856567,0.15405245
 sinus 1 Input 13 Sets 50 Epochs,119.812044155,0.6319363
+--- This are the tests with different wiggle room
+sinus 1 Input 13 Sets 10 Epochs,19.817170900999997,0.3919488; +- 0.5
+sinus 1 Input 13 Sets 10 Epochs,20.260273104,0.5109837; +- 0.05
+sinus 1 Input 13 Sets 10 Epochs,19.855003409000002,0.2856632; +- 0.01
+sinus 1 Input 13 Sets 10 Epochs,21.038370159,0.29584694; no wiggle room
+sinus 1 Input 13 Sets 10 Epochs,20.130977621,0.32676667; +- 1e-5
+sinus 1 Input 13 Sets 10 Epochs,21.146741949000003,0.40262428; mit float64 +- 1e-5
+sinus 1 Input 13 Sets 10 Epochs,21.280402299000002,0.31961957; float64 +- 1e-10
+sinus 1 Input 13 Sets 10 Epochs,21.882244809,0.61029416; float64 +- 1e-8
+sinus 1 Input 13 Sets 10 Epochs,21.514517223000002,0.6692833; float64 +- 1e-7

@@ -7,22 +7,24 @@ import random
 import plotly.plotly as py
 import plotly.graph_objs as go
 from utils.csv_utils import write_in_csv
-
-from utils.file_reader import readFile
+from utils.file_reader import readFile, range_one_input
+import numpy as np
 
 
 class Anfis:
     # num_inputs is not being used. trying the simple way of calculating
-    def __init__(self, num_sets, range, mat=None, num_inputs=None, path=None, fulltrain=False):
+    def __init__(self, num_sets, range=None, mat=None, num_inputs=None, path=None, fulltrain=False):
         self.num_sets = num_sets
-        self.test_possible = False
+        # self.test_possible = False
         self.trainXArr = []
         self.trainYArr = []
         self.testXArr = []
         self.testYArr = []
         self.constraints = []
-        self.prediction = []
-        self.labels = []
+        # self.prediction = []
+        # self.labels = []
+
+        self.range = range
 
         self.fileName = ''
         with open(path) as file:
@@ -32,10 +34,13 @@ class Anfis:
         # mat array is an array wich contains all the test data.
         if (mat != None):
             self.num_inputs = len(mat[0])
-            self.test_possible = True
+            # self.test_possible = True
         elif (num_inputs != None):
             self.num_inputs = num_inputs
         elif path != None:
+            self.range = range_one_input(path, 0)
+            print(self.range.dtype)
+            # print("Range of value for the variable x1: {}".format(r))
             if not fulltrain:
                 xArr, yArr = readFile(path)
                 sizeOfArr = len(xArr)
@@ -58,7 +63,6 @@ class Anfis:
             self.num_inputs = 1
 
         self.num_rules = num_sets ** self.num_inputs
-        self.range = range
 
         self.sess = tf.Session()
 
@@ -66,10 +70,15 @@ class Anfis:
         # self.premisses = [[None] * self.num_sets]*self.num_inputs
         # self.rules_arr = [None] * self.num_rules
 
-        self.a_0 = tf.get_variable(name="a_0", dtype=tf.float32,
-                                   initializer=tf.ones(shape=(self.num_rules, 1)), trainable=1)
-        self.a_y = tf.get_variable(name="a_y", dtype=tf.float32,
-                                   initializer=tf.ones(shape=(self.num_rules, self.num_inputs)), trainable=1)
+        self.a_0 = tf.get_variable(name="a_0", dtype=tf.float64,
+                                   initializer=np.ones(shape=(self.num_rules, 1)).astype(np.float64)
+                                   # tf.ones(shape=(self.num_rules, 1))
+                                   , trainable=1)
+
+        self.a_y = tf.get_variable(name="a_y", dtype=tf.float64,
+                                   initializer=np.ones(shape=(self.num_rules, self.num_inputs)).astype(np.float64)
+                                   # tf.ones(shape=(self.num_rules, self.num_inputs))
+                                   , trainable=1)
 
         self.sess.run(self.a_0.initializer)
         self.sess.run(self.a_y.initializer)
@@ -80,10 +89,10 @@ class Anfis:
         self.saver = tf.train.Saver()
 
         # input variable
-        self.x = tf.placeholder(name="x", shape=[self.num_inputs], dtype=tf.float32)
+        self.x = tf.placeholder(name="x", shape=[self.num_inputs], dtype=tf.float64)
         tf.add_to_collection("xVar", self.x)
         # expected result
-        self.y = tf.placeholder(name="y", shape=(), dtype=tf.float32)
+        self.y = tf.placeholder(name="y", shape=(), dtype=tf.float64)
         tf.add_to_collection("yVar", self.y)
 
         # First Hidden Layer
@@ -193,19 +202,20 @@ class Anfis:
             valArr = []
             for f in range(self.num_sets):
                 if f == 0:
-                    a = tf.get_variable(initializer=tf.constant(self.range[0] * 1.0), name="a" + str(i) + str(f),
-                                        dtype=tf.float32, trainable=0)
-                    valArr.append(self.range[0] * 1.0)
-                else:
-                    a = tf.get_variable(initializer=tf.constant(val - 2 * val_inc),
+                    a = tf.get_variable(initializer=tf.constant(self.range[0]),
                                         name="a" + str(i) + str(f),
-                                        dtype=tf.float32)
-                    valArr.append(val - 2 * val_inc)
+                                        dtype=tf.float64, trainable=0)
+                    valArr.append(self.range[0])
+                else:
+                    a = tf.get_variable(initializer=tf.constant((val - 2 * val_inc)),
+                                        name="a" + str(i) + str(f),
+                                        dtype=tf.float64)
+                    valArr.append((val - 2 * val_inc))
 
                 val = val + val_inc
                 ind += 1
 
-                m = tf.get_variable(name="m" + str(i) + str(f), dtype=tf.float32, trainable=1,
+                m = tf.get_variable(name="m" + str(i) + str(f), dtype=tf.float64, trainable=1,
                                     initializer=tf.constant(val))
 
                 valArr.append(val)
@@ -215,18 +225,18 @@ class Anfis:
                 ind += 1
 
                 if (self.num_sets * i + f) == (num_mfs - 1):
-                    b = tf.get_variable(name="b" + str(i) + str(f), dtype=tf.float32,
-                                        initializer=tf.constant(self.range[1] * 1.0), trainable=0)
+                    b = tf.get_variable(name="b" + str(i) + str(f), dtype=tf.float64,
+                                        initializer=tf.constant(self.range[1]), trainable=0)
                     valArr.append(self.range[1])
                 else:
-                    b = tf.get_variable(name="b" + str(i) + str(f), dtype=tf.float32,
+                    b = tf.get_variable(name="b" + str(i) + str(f), dtype=tf.float64,
                                         trainable=1,
                                         initializer=tf.constant(val))
 
                     valArr.append(val)
 
                 with tf.variable_scope("", reuse=True):
-                    m = tf.get_variable(name="m" + str(i) + str(f), shape=(),
+                    m = tf.get_variable(name="m" + str(i) + str(f), shape=(), dtype=tf.float64,
                                         constraint=lambda x: tf.clip_by_value(m, a, b))
 
                 val = val + val_inc
@@ -244,7 +254,7 @@ class Anfis:
         index = 0
         start = t.process_time()
         for perm in it.product(range(self.num_sets), repeat=self.num_inputs):
-            tmp = tf.ones(shape=(), dtype=tf.float32)
+            tmp = tf.ones(shape=(), dtype=tf.float64)
             for i in range(len(perm)):
                 tmp = tf.multiply(premisses[i][perm[i]], tmp)
             self.mf[index] = tmp
@@ -426,6 +436,7 @@ class Anfis:
             y_val.append(self.testYArr[i])
             y_before_trn.append(self.doCalculation(sess, self.testXArr[i]))
 
+    # NOTE: Maybe not needed
     def create_table(self, type, time, error):
 
         header = dict(values=['<b>Types</b>', '<b>Time</b>', '<b>Error</b>'],
