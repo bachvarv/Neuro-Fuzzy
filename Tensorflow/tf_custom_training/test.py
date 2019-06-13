@@ -2,7 +2,6 @@ import timeit
 from random import uniform
 import matplotlib.pyplot as plt
 import time
-import numpy as np
 
 from utils.data_generation import genDataSetWithNoise
 
@@ -22,13 +21,11 @@ chk_dataY = y_data[:, -501:]
 
 # chk_data = np.concatenate((chk_dataX, chk_dataY), axis=1)
 
-print(chk_dataX[0], chk_dataY)
-
 num_inputs = 2
 
 mat = [[3]]
 
-num_sets = 13
+num_sets = 4
 
 num_conclusions = 2
 
@@ -40,7 +37,7 @@ num_conclusions = 2
 #           path="../utils/sinus.out", fulltrain=True)
 
 f = Anfis(num_sets=num_sets,
-          path="../utils/sinus.out", fulltrain=True)
+          path="../utils/parabola_1000.out", full_train=True, gradient_type=0)
 
 # for i in a:
 #     print(i)
@@ -61,9 +58,23 @@ with f.sess as sess:
 
 
     # init_new_vars_op =  tf.variables_initializer(uninitialized_vars)
-    sess.run(f.getVariableInitializer())
+    sess.run(f.get_variable_initializer())
+    # arr_x, arr_y = f.pick_batch()
+    # sess.run(f.)
+    # print(arr_x)
+    # print(arr_y)
+    # print(sess.run(f.reshaped_mfs, feed_dict={f.x: arr_x}))
+    #
+    # mat = tf.reshape(f.reshaped_mfs, shape=(5, 4))
+    # print(sess.run(mat, feed_dict={f.x: arr_x}))
+    #
+    # matrix = tf.reduce_sum(f.reshaped_mfs, 1, keep_dims=True)
+    # print(sess.run(matrix, feed_dict={f.x: arr_x}))
+    #
+    # print(sess.run(f.normalizedMFs, feed_dict={f.x: arr_x}))
 
-
+    # print(sess.run(f.conclusions, feed_dict={f.x: arr_x}))
+    # f.do_calculation(sess, arr_x[0])
     # print(sess.run(f.var))
     #
     # print(sess.run(f.var))
@@ -168,7 +179,7 @@ with f.sess as sess:
     # for i in epochs:
     #     print("Training Time %fs." % f.train(sess, i))
 
-    print("Training Time %fs." % f.train(sess, 10))
+    print("Training Time %fs." % f.train(sess, 20))
     # print("Fehlerrate für", candidate, ":", f.train_2(sess, trn_dataX[i], trn_dataY[0][i]))
 
     # print("Fehlerrate für", candidate, ":", f.train_2(sess, x, y))
@@ -185,8 +196,8 @@ with f.sess as sess:
     a_y = sess.run(f.a_y)
     a_0 = sess.run(f.a_0)
     # print("MFs:", f.plotParam(sess, 224, "MFs after Training"))
-    print("a_0", a_0)
-    print("a_y:", a_y)
+    # print("a_0", a_0)
+    # print("a_y:", a_y)
 
     end = time.process_time()
     print("Time of the program from start to finnish: %fs" % (end-start))

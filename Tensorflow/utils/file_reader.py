@@ -120,12 +120,8 @@ array = np.ones(shape=(2,2), dtype=float)
 # print(array)
 
 converted = np.ndarray(shape=(len(array), len(array[0])) ,buffer=array)
-
-# print(converted)
-
 # xVal = xArr[:size]
 #
 # print(xVal)
 #
 # testData = yArr[5:]
-# print(testData)

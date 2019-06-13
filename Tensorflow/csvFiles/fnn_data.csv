@@ -85,3 +85,10 @@ sinus 1 Input 13 Sets 10 Epochs,21.146741949000003,0.40262428; mit float64 +- 1e
 sinus 1 Input 13 Sets 10 Epochs,21.280402299000002,0.31961957; float64 +- 1e-10
 sinus 1 Input 13 Sets 10 Epochs,21.882244809,0.61029416; float64 +- 1e-8
 sinus 1 Input 13 Sets 10 Epochs,21.514517223000002,0.6692833; float64 +- 1e-7
+parabola_1001 1 Input 4 Sets 50 Epochs,117.850809544,92.775085
+parabola_1001 1 Input 4 Sets 50 Epochs,114.356801168,92.06596
+parabola_1001 1 Input 4 Sets 100 Epochs,234.36598624200002,61.003628
+parabola_1001 1 Input 3 Sets 100 Epochs,198.732343613,63.054523
+parabola_1001 1 Input 2 Sets 100 Epochs,319.195004525,50.236828
+parabola_1001 1 Input 2 Sets 100 Epochs,170.72860824,50.236828
+parabola_1001 1 Input 2 Sets 100 Epochs,170.705007161,50.236828
