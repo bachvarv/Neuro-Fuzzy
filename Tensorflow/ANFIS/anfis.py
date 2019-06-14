@@ -1,3 +1,4 @@
+
 import os
 import tensorflow as tf
 import itertools as it
@@ -10,6 +11,7 @@ import plotly.graph_objs as go
 from utils.csv_utils import write_in_csv
 from utils.file_reader import readFile, range_one_input
 import numpy as np
+
 
 
 class Anfis:
@@ -97,6 +99,7 @@ class Anfis:
         # Saver to export graph(model)
         self.saver = tf.train.Saver()
 
+
         # Input Variable/First Outer Layer (First Layer)
         self.x = None
         # expected result
@@ -170,7 +173,6 @@ class Anfis:
         dividend_right = tf.add(tf.subtract(par[2], x), 1e-10)
         divider_right = tf.subtract(par[2], par[1])
         min_right = tf.divide(dividend_right, divider_right)
-
         min_func = tf.minimum(min_left, min_right)
         m_1 = tf.maximum(min_func, 0.0, name=name)
 

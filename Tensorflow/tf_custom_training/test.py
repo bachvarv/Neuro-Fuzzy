@@ -1,13 +1,16 @@
+
 import timeit
 from random import uniform
 import matplotlib.pyplot as plt
 import time
+
 
 from utils.data_generation import genDataSetWithNoise
 
 import tensorflow as tf
 
 from ANFIS.anfis import Anfis
+
 
 # start = timeit.timeit()
 start = time.process_time()
@@ -54,7 +57,6 @@ with f.sess as sess:
     #     except tf.errors.FailedPreconditionError:
     #         print(var)
     #         uninitialized_vars.append(var)
-
 
 
     # init_new_vars_op =  tf.variables_initializer(uninitialized_vars)
@@ -184,7 +186,6 @@ with f.sess as sess:
 
     # print("Fehlerrate für", candidate, ":", f.train_2(sess, x, y))
     print("-----------------------------------------------------")
-
 
     # save the graph for export
     # f.save_graph(sess, "model", 1000)
