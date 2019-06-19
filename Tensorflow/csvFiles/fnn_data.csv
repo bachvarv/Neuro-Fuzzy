@@ -92,3 +92,8 @@ parabola_1001 1 Input 3 Sets 100 Epochs,198.732343613,63.054523
 parabola_1001 1 Input 2 Sets 100 Epochs,319.195004525,50.236828
 parabola_1001 1 Input 2 Sets 100 Epochs,170.72860824,50.236828
 parabola_1001 1 Input 2 Sets 100 Epochs,170.705007161,50.236828
+
+--- This are the tests with different gradient descent types.
+sinus 1 Input 4 Sets 50 Epochs,0.8690736809999997,0.019926637
+sinus 1 Input 4 Sets 50 Epochs,0.9019778079999998,0.001998174
+sinus 1 Input 4 Sets 50 Epochs,0.8474308009999998,0.009174488
