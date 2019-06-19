@@ -420,7 +420,7 @@ class Anfis:
 
         rowData = [[n, str(end - start), str(v)]]
         print(rowData)
-        write_in_csv('../csvFiles/fnn_data.csv', rowData)
+        write_in_csv('../csvFiles/model_data.csv', rowData)
 
         return end - start
 
