@@ -1,14 +1,17 @@
 from random import uniform
 import matplotlib.pyplot as plt
 import time
+
+
 from ANFIS.anfis import Anfis
 
+
 start = time.process_time()
-num_sets = 4
+num_sets = 3
 
 
 f = Anfis(num_sets=num_sets,
-          path="../utils/sinus.out", gradient_type=1)
+          path="../utils/parabola_1000.out", gradient_type=1)
 
 with f.sess as sess:
     sess.run(f.get_variable_initializer())
@@ -28,7 +31,7 @@ with f.sess as sess:
 
     x = [candidate]
 
-    print("Training Time %fs." % f.train(sess, 50))
+    print("Training Time %fs." % f.train(sess, 1000))
     print("-----------------------------------------------------")
 
     a_y = sess.run(f.a_y)
@@ -38,4 +41,5 @@ with f.sess as sess:
 
     end = time.process_time()
     print("Time of the program from start to finnish: %fs" % (end-start))
+
     plt.show()

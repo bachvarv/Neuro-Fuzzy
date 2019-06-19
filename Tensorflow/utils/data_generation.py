@@ -3,6 +3,7 @@ import numpy as np
 from utils.file_reader import createFile
 
 
+
 def genDataSetWithNoise(input, size):
     x_data = np.random.randn(size, input)
 
@@ -22,3 +23,4 @@ def genDataSetWithNoise(input, size):
 # print(y_data)
 
 # createFile(x_data, y_data)
+

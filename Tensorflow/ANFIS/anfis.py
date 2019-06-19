@@ -1,3 +1,4 @@
+
 import os
 import tensorflow as tf
 import itertools as it
@@ -10,6 +11,7 @@ import plotly.graph_objs as go
 from utils.csv_utils import write_in_csv
 from utils.file_reader import readFile, range_one_input
 import numpy as np
+
 
 
 class Anfis:
@@ -50,7 +52,6 @@ class Anfis:
         elif path is not None:
             self.range = range_one_input(path, 0)
             print(self.range.dtype)
-            # print("Range of value for the variable x1: {}".format(r))
             if not self.full_train:
                 x_arr, y_arr = readFile(path)
                 arr_size = len(x_arr)
@@ -96,6 +97,7 @@ class Anfis:
 
         # Saver to export graph(model)
         self.saver = tf.train.Saver()
+
 
         # Input Variable/First Outer Layer (First Layer)
         self.x = None
@@ -362,7 +364,7 @@ class Anfis:
         else:
             for i in range(epochs):
                 size = len(self.train_x_arr)
-                x_arr = np.reshape(self.train_x_arr, (size))
+                x_arr = np.reshape(self.train_x_arr, (self.num_inputs, size))
                 y_arr = np.reshape(self.train_y_arr, (size))
 
                 sess.run([self.loss, self.optimizer],
@@ -441,7 +443,7 @@ class Anfis:
             yArr.clear()
         return mfpar
 
-    def __pick_batch(self, size=0, arr=None):
+    def __pick_batch(self):
         indexes = sample(range(len(self.train_x_arr)), self.mini_batch_size)
 
         batch_x = []
