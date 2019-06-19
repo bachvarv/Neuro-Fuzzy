@@ -9,12 +9,12 @@ start = time.process_time()
 num_sets = 3
 
 f = Anfis(num_sets=num_sets,
-          path="../utils/parabola_1000.out", gradient_type=1)
+          path="../utils/parabola_1000.out", gradient_type=0)
 
 with f.sess as sess:
     sess.run(f.get_variable_initializer())
 
-    print("Training Time %fs." % f.train(sess, 1000))
+    print("Training Time %fs." % f.train(sess, 10))
     print("-----------------------------------------------------")
 
     a_y = sess.run(f.a_y)
@@ -23,6 +23,6 @@ with f.sess as sess:
     print("a_y:", a_y)
 
     end = time.process_time()
-    print("Time of the program from start to finnish: %fs" % (end-start)
+    print("Time of the program from start to finnish: %fs" % (end-start))
 
     plt.show()

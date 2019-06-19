@@ -3,3 +3,6 @@ sinus 1 Input 4 Sets 40 Epochs,0.7331679600000003,0.012053342,Mini-Batch Gradien
 sinus 1 Input 4 Sets 40 Epochs,1.2333752420000001,1.7055331,Mini-Batch Gradient Descent
 sinus 1 Input 4 Sets 40 Epochs,0.7788141619999998,1.264442,Mini-Batch Gradient Descent
 sinus 1 Input 4 Sets 40 Epochs,0.7444930510000001,0.7763498,Mini-Batch Gradient Descent
+parabola_1000 1 Input 3 Sets 100 Epochs,1.5266220019999999,6086034.5,Mini-Batch Gradient Descent
+parabola_1000 1 Input 3 Sets 100 Epochs,0.42872898300000006,15526314.0,Batch Gradient Descent
+parabola_1000 1 Input 3 Sets 10 Epochs,20.604986881,1135900.2,Stochastic Gradient Descent

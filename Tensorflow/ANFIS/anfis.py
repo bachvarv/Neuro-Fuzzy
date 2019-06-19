@@ -4,15 +4,14 @@ import tensorflow as tf
 import itertools as it
 import matplotlib.pyplot as plt
 import time as t
-import random
 from random import sample
-import plotly.plotly as py
-import plotly.graph_objs as go
 from utils.csv_utils import write_in_csv
 from utils.file_reader import readFile, range_one_input
 import numpy as np
 
-
+batch_types = {0: 'Stochastic Gradient Descent',
+              1: 'Mini-Batch Gradient Descent',
+              2: 'Batch Gradient Descent'}
 
 class Anfis:
     # num_inputs is not being used. trying the simple way of calculating
@@ -20,11 +19,7 @@ class Anfis:
     # 0-type = Stochastic Gradient Descent
     # 1-type = Mini-Batch Gradient Descent, 30 samples from the training data
     # 2-type = Batch Gradient Descent
-
-    # mini_batch_size = 30
-
-
-    def __init__(self, num_sets, r=None, mat=None, num_inputs=None, path=None, gradient_type=0):
+    def __init__(self, num_sets, path=None, gradient_type=0):
         self.num_sets = num_sets
         # self.test_possible = False
         self.train_x_arr = []
@@ -35,25 +30,14 @@ class Anfis:
         self.gradient_type = gradient_type
         self.full_train = True
 
-        # self.prediction = []
-        # self.labels = []
-
-        self.range = r
-
         self.fileName = ''
         with open(path) as file:
             self.fileName = os.path.basename(file.name[:-4])
 
         # Last index of an array is the expected value.
         # mat array is an array wich contains all the test data.
-        if mat is not None:
-            self.num_inputs = len(mat[0])
-            # self.test_possible = True
-        elif num_inputs is not None:
-            self.num_inputs = num_inputs
-        elif path is not None:
+        if path is not None:
             self.range = range_one_input(path, 0)
-            print(self.range.dtype)
             if not self.full_train:
                 x_arr, y_arr = readFile(path)
                 arr_size = len(x_arr)
@@ -77,28 +61,19 @@ class Anfis:
 
         self.sess = tf.Session()
 
-        # Variables to Create the Membership functions
-        # self.premisses = [[None] * self.num_sets]*self.num_inputs
-        # self.rules_arr = [None] * self.num_rules
-
+        # Conclusion Parameters
         self.a_0 = tf.get_variable(name="a_0", dtype=tf.float64,
                                    initializer=np.ones(shape=(self.num_rules, 1))
-                                   # tf.ones(shape=(self.num_rules, 1))
                                    , trainable=1)
 
         self.a_y = tf.get_variable(name="a_y", dtype=tf.float64,
                                    initializer=np.ones(shape=(self.num_rules, self.num_inputs))
-                                   # tf.ones(shape=(self.num_rules, self.num_inputs))
                                    , trainable=1)
 
-        # self.sess.run(self.a_0.initializer)
-        # self.sess.run(self.a_y.initializer)
-        #
         self.var = [[None] * self.num_sets] * self.num_inputs
 
         # Saver to export graph(model)
         self.saver = tf.train.Saver()
-
 
         # Input Variable/First Outer Layer (First Layer)
         self.x = None
@@ -109,7 +84,6 @@ class Anfis:
         # First and Second Hidden Layer (Second and Third Layer)
         self.mf = [None] * self.num_rules
         self.premises = [[None] * self.num_rules] * self.num_inputs
-        # self.member_func(mf_param)
         self.second_layer()
 
         # Third Hidden Layers (Fourth Layer)
@@ -141,20 +115,20 @@ class Anfis:
 
     def first_layer(self):
         if self.gradient_type == 0:
-            self.mini_batch_size = self.num_inputs
-            self.x = tf.placeholder(name="x", shape=(self.num_inputs, self.mini_batch_size), dtype=tf.float64)
+            self.batch_size = self.num_inputs
+            self.x = tf.placeholder(name="x", shape=(self.num_inputs, self.batch_size), dtype=tf.float64)
             # expected result
-            self.y = tf.placeholder(name="y", shape=(self.mini_batch_size), dtype=tf.float64)
+            self.y = tf.placeholder(name="y", shape=(self.batch_size), dtype=tf.float64)
         elif self.gradient_type == 1:
-            self.mini_batch_size = int((1 / 5) * (len(self.train_x_arr)))
-            self.x = tf.placeholder(name="x", shape=(self.num_inputs, self.mini_batch_size), dtype=tf.float64)
+            self.batch_size = int((1 / 5) * (len(self.train_x_arr)))
+            self.x = tf.placeholder(name="x", shape=(self.num_inputs, self.batch_size), dtype=tf.float64)
             # expected result
-            self.y = tf.placeholder(name="y", shape=(self.mini_batch_size), dtype=tf.float64)
+            self.y = tf.placeholder(name="y", shape=(self.batch_size), dtype=tf.float64)
         elif self.gradient_type == 2:
-            self.mini_batch_size = len(self.train_x_arr)
-            self.x = tf.placeholder(name="x", shape=(self.num_inputs, self.mini_batch_size), dtype=tf.float64)
+            self.batch_size = len(self.train_x_arr)
+            self.x = tf.placeholder(name="x", shape=(self.num_inputs, self.batch_size), dtype=tf.float64)
             # expected result
-            self.y = tf.placeholder(name="y", shape=(self.mini_batch_size), dtype=tf.float64)
+            self.y = tf.placeholder(name="y", shape=(self.batch_size), dtype=tf.float64)
 
         tf.add_to_collection("xVar", self.x)
         tf.add_to_collection("yVar", self.y)
@@ -236,7 +210,7 @@ class Anfis:
         index = 0
         start = t.process_time()
         for perm in it.product(range(self.num_sets), repeat=self.num_inputs):
-            tmp = tf.ones(shape=(self.mini_batch_size), dtype=tf.float64)
+            tmp = tf.ones(shape=(self.batch_size), dtype=tf.float64)
             for i in range(len(perm)):
                 tmp = tf.multiply(self.premises[i][perm[i]], tmp)
             self.mf[index] = tmp
@@ -319,12 +293,12 @@ class Anfis:
             y_before_trn = self.do_calculation(sess, x_val)
         else:
             for i in range(5):
-                start_index = i * self.mini_batch_size
-                end_index = (i + 1) * self.mini_batch_size
+                start_index = i * self.batch_size
+                end_index = (i + 1) * self.batch_size
 
                 arr_x = self.test_x_arr[start_index:end_index]
                 arr_y = self.test_y_arr[start_index:end_index]
-                arr_x = np.reshape(arr_x, (self.mini_batch_size))
+                arr_x = np.reshape(arr_x, (self.batch_size))
 
                 x_val.append(arr_x)
                 y_val.append(arr_y)
@@ -350,12 +324,11 @@ class Anfis:
                     sess.run(self.constraints)
         elif self.gradient_type == 1:
             times = 5
-            # times = int(len(self.train_x_arr) / self.mini_batch_size)
             for i in range(epochs):
                 for j in range(times):
                     batch_x, batch_y = self.__pick_batch()
-                    batch_x = np.reshape(batch_x, (self.mini_batch_size))
-                    batch_y = np.reshape(batch_y, (self.mini_batch_size))
+                    batch_x = np.reshape(batch_x, (self.batch_size))
+                    batch_y = np.reshape(batch_y, (self.batch_size))
 
                     sess.run([self.loss, self.optimizer],
                              feed_dict={self.x: [batch_x], self.y: batch_y})
@@ -379,11 +352,11 @@ class Anfis:
         elif self.gradient_type == 1:
             times = 5
             for i in range(times):
-                start_index = i * self.mini_batch_size
-                end_index = (i + 1) * self.mini_batch_size
+                start_index = i * self.batch_size
+                end_index = (i + 1) * self.batch_size
 
                 arr_x = self.test_x_arr[start_index:end_index]
-                arr_x = np.reshape(arr_x, (self.mini_batch_size))
+                arr_x = np.reshape(arr_x, (self.batch_size))
                 y_after_trn.append(self.do_calculation(sess, arr_x))
         else:
             size = len(self.test_x_arr)
@@ -417,10 +390,9 @@ class Anfis:
         fig.savefig('../graphics/fourthgraphics/' +
                     n + '.png')
 
-        rowData = [[n, str(end - start), str(v)]]
-        print(rowData)
-        write_in_csv('../csvFiles/model_data.csv', rowData)
-
+        row_data = [[n, str(end - start), str(v), batch_types[self.gradient_type]]]
+        print(row_data)
+        write_in_csv('../csvFiles/model_data.csv', row_data)
 
         return end - start
 
@@ -443,7 +415,7 @@ class Anfis:
         return mfpar
 
     def __pick_batch(self):
-        indexes = sample(range(len(self.train_x_arr)), self.mini_batch_size)
+        indexes = sample(range(len(self.train_x_arr)), self.batch_size)
 
         batch_x = []
         batch_y = []
