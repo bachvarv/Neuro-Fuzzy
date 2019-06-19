@@ -1,0 +1,5 @@
+Type,Time,Error,Gradient Type
+sinus 1 Input 4 Sets 40 Epochs,0.7331679600000003,0.012053342,Mini-Batch Gradient Descent
+sinus 1 Input 4 Sets 40 Epochs,1.2333752420000001,1.7055331,Mini-Batch Gradient Descent
+sinus 1 Input 4 Sets 40 Epochs,0.7788141619999998,1.264442,Mini-Batch Gradient Descent
+sinus 1 Input 4 Sets 40 Epochs,0.7444930510000001,0.7763498,Mini-Batch Gradient Descent
