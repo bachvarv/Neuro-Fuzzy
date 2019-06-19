@@ -23,6 +23,7 @@ class Anfis:
 
     # mini_batch_size = 30
 
+
     def __init__(self, num_sets, r=None, mat=None, num_inputs=None, path=None, gradient_type=0):
         self.num_sets = num_sets
         # self.test_possible = False
@@ -33,6 +34,7 @@ class Anfis:
         self.constraints = []
         self.gradient_type = gradient_type
         self.full_train = True
+
         # self.prediction = []
         # self.labels = []
 
@@ -63,7 +65,6 @@ class Anfis:
                 self.num_inputs = len(self.train_x_arr[0])
             else:
                 x_arr, y_arr = readFile(path)
-
                 self.train_x_arr = x_arr
                 self.train_y_arr = y_arr
                 self.test_x_arr = x_arr
@@ -290,7 +291,6 @@ class Anfis:
     def train(self, sess, epochs=1):
 
         sess.run(self.get_variable_initializer())
-
         # Init of arrays
         x_val = []
         y_val = []
@@ -412,7 +412,6 @@ class Anfis:
         v = sess.run(error)
 
         print(v)
-
         n = self.fileName + ' 1 Input ' + str(self.num_sets) + ' Sets ' + str(epochs) + ' Epochs'
 
         fig.savefig('../graphics/fourthgraphics/' +
@@ -422,13 +421,13 @@ class Anfis:
         print(rowData)
         write_in_csv('../csvFiles/model_data.csv', rowData)
 
+
         return end - start
 
     def plot_param(self, sess, plot, name):
         mfpar = sess.run(self.var)
         xArr = []
         yArr = []
-
         plot.set_title(name)
 
         for i in mfpar[0]:
