@@ -1,4 +1,3 @@
-
 import os
 import tensorflow as tf
 import itertools as it
@@ -10,8 +9,11 @@ from utils.file_reader import readFile, range_one_input
 import numpy as np
 
 batch_types = {0: 'Stochastic Gradient Descent',
-              1: 'Mini-Batch Gradient Descent',
-              2: 'Batch Gradient Descent'}
+               1: 'Mini-Batch Gradient Descent',
+               2: 'Batch Gradient Descent'}
+
+mf_types = {0: 'two equations mf',
+            1: 'one equation mf'}
 
 class Anfis:
     # num_inputs is not being used. trying the simple way of calculating
@@ -19,7 +21,7 @@ class Anfis:
     # 0-type = Stochastic Gradient Descent
     # 1-type = Mini-Batch Gradient Descent, 30 samples from the training data
     # 2-type = Batch Gradient Descent
-    def __init__(self, num_sets, path=None, gradient_type=0):
+    def __init__(self, num_sets, path=None, gradient_type=0, mf_type=0):
         self.num_sets = num_sets
         # self.test_possible = False
         self.train_x_arr = []
@@ -29,6 +31,7 @@ class Anfis:
         self.constraints = []
         self.gradient_type = gradient_type
         self.full_train = True
+        self.mf_type = mf_type
 
         self.fileName = ''
         with open(path) as file:
@@ -133,17 +136,28 @@ class Anfis:
         tf.add_to_collection("xVar", self.x)
         tf.add_to_collection("yVar", self.y)
 
-    @staticmethod
-    def triangular_mf(x, par, name):
+    def triangular_mf(self, x, par, name):
         # we define the triangular function
-        dividend = tf.abs(tf.subtract(par[1], x))
-        divider = tf.subtract(par[2], par[0])
-        op = tf.divide(dividend, divider)
-        mul = tf.multiply(tf.cast([2.], tf.float64), op)
-        sub = tf.subtract(tf.cast([1.], tf.float64), mul)
-        max = tf.maximum(tf.cast([0.], tf.float64), sub, name=name)
-
-        return max
+        if self.mf_type == 0:
+            dividend_left = tf.subtract(x, par[0])
+            divider_left = tf.subtract(par[1], par[0])
+            division_left = tf.divide(dividend_left, divider_left)
+            #
+            dividend_right = tf.subtract(par[2], x)
+            divider_right = tf.subtract(par[2], par[1])
+            division_right = tf.divide(dividend_right, divider_right)
+            #
+            minim = tf.minimum(division_left, division_right)
+            maxim = tf.maximum(minim, tf.cast(0.0, tf.float64))
+            return maxim
+        elif self.mf_type==1:
+            dividend = tf.abs(tf.subtract(par[1], x))
+            divider = tf.subtract(par[2], par[0])
+            op = tf.divide(dividend, divider)
+            mul = tf.multiply(tf.cast([2.], tf.float64), op)
+            sub = tf.subtract(tf.cast([1.], tf.float64), mul)
+            maxim = tf.maximum(tf.cast([0.], tf.float64), sub, name=name)
+            return maxim
 
     def second_layer(self):
         start = t.process_time()
@@ -201,7 +215,8 @@ class Anfis:
                 self.constraints.append(tf.assign(a, tf.clip_by_value(a, self.range[0], m - 1e-2)))
                 self.constraints.append(tf.assign(b, tf.clip_by_value(b, m + 1e-2, self.range[1])))
                 self.constraints.append(tf.assign(m, tf.clip_by_value(m, self.range[0] + 0.1, self.range[1] - 0.1)))
-
+                if f > 0:
+                    self.constraints.append(tf.assign(a, tf.clip_by_value(a, self.range[0], self.var[i][f - 1][2] - 1)))
                 self.premises[i][f] = self.triangular_mf(self.x[i], self.var[i][f], "test_mf" + str(i) + str(f))
             val_arr.clear()
         end = t.process_time()
@@ -220,7 +235,7 @@ class Anfis:
 
     def third_layer(self):
         # Reshape the MFs
-        self.mf_sum = tf.reduce_sum(tf.add(self.mf, [1e-10]), 0)
+        self.mf_sum = tf.reduce_sum(tf.add(self.mf, [1e-12]), 0)
 
         # Normalize the MFs
         self.normalizedMFs = tf.divide(self.mf, self.mf_sum)
@@ -238,7 +253,10 @@ class Anfis:
         return sess.run(self.result, feed_dict={self.x: [x]})
 
     def optimize_method(self):
+        # 15542508.0
         self.loss = tf.losses.mean_squared_error(self.y, self.result)
+        # 15543155.0
+        # self.loss = tf.reduce_mean(tf.squared_difference(self.y, self.result))
         # self.loss = tf.losses.huber_loss(self.y, self.result)
 
         # self.optimizer = tf.train.GradientDescentOptimizer(learning_rate=0.1).minimize(self.loss)
@@ -318,6 +336,7 @@ class Anfis:
         if self.gradient_type == 0:
             for s in range(epochs):
                 for i in range(len(self.train_x_arr)):
+
                     sess.run([self.loss, self.optimizer],
                              feed_dict=
                              {self.x: [self.train_x_arr[i]], self.y: self.train_y_arr[i]})
@@ -379,20 +398,32 @@ class Anfis:
                                    "MF %d after training" % (i + 1))
             print("Parameters nach dem Training: {} \n".format(vars[i]))
 
+        # print(self.do_calculation(sess, [0]))
+
         prediction = y_after_trn
         labels = y_val
         error = tf.losses.mean_squared_error(labels, prediction)
         v = sess.run(error)
 
-        print(v)
-        n = self.fileName + ' 1 Input ' + str(self.num_sets) + ' Sets ' + str(epochs) + ' Epochs'
+        iterations = epochs
 
-        fig.savefig('../graphics/fourthgraphics/' +
+        if self.gradient_type == 0:
+            iterations = epochs * len(self.train_x_arr)
+        elif self.gradient_type == 1:
+            iterations = epochs * 5
+
+        # print(v)
+        n = self.fileName + ' 1 Input ' + str(self.num_sets) + ' Sets ' + str(iterations) + ' Epochs ' + batch_types[
+            self.gradient_type] + ' ' + mf_types[self.mf_type]
+
+        folder = self.fileName + '/' + batch_types[self.gradient_type].split(' ')[0] + '/'
+
+        fig.savefig('../graphics/fifthgraphics/' + folder +
                     n + '.png')
 
-        row_data = [[n, str(end - start), str(v), batch_types[self.gradient_type]]]
+        row_data = [[n, str(end - start), str(v), batch_types[self.gradient_type], mf_types[self.mf_type]]]
         print(row_data)
-        write_in_csv('../csvFiles/model_data.csv', row_data)
+        write_in_csv('../csvFiles/model_results.csv', row_data)
 
         return end - start
 

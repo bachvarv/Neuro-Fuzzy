@@ -85,8 +85,18 @@ def range_one_input(path, index):
                 line = file.readline()
 
         # NOTE: The amount of wiggle room for the value changes the error rate drastically
-        val_range[0] = lowest - 1e-7
-        val_range[1] = highest + 1e-7
+
+        res = 0
+        if lowest > -10 and lowest < 10:
+            res = 1e-2
+        elif lowest >= -100 and lowest > -1000:
+            res = 2*abs(lowest) / 100
+        else:
+            res = 2*(abs(lowest) / 1000)
+
+
+        val_range[0] = lowest - res
+        val_range[1] = highest + res
     return val_range
 
 
