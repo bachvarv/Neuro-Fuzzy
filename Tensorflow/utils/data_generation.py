@@ -19,6 +19,7 @@ def genDataSetWithNoise(input, size):
 # x_data, y_data, w_real, b_real, noise = genDataSetWithNoise(1, 2000)
 
 
+
 # print(x_data)
 # print(y_data)
 

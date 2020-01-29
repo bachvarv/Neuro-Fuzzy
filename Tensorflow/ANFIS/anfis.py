@@ -117,45 +117,57 @@ class Anfis:
     # Finish it with the rest of the program Code
 
     def first_layer(self):
+        # three different types for gradient descent type
+        # so we have three types of batch size, wich defines the amount of elements to be evaluated in one interation
         if self.gradient_type == 0:
             self.batch_size = self.num_inputs
-            self.x = tf.placeholder(name="x", shape=(self.num_inputs, self.batch_size), dtype=tf.float64)
-            # expected result
-            self.y = tf.placeholder(name="y", shape=(self.batch_size), dtype=tf.float64)
         elif self.gradient_type == 1:
             self.batch_size = int((1 / 5) * (len(self.train_x_arr)))
-            self.x = tf.placeholder(name="x", shape=(self.num_inputs, self.batch_size), dtype=tf.float64)
-            # expected result
-            self.y = tf.placeholder(name="y", shape=(self.batch_size), dtype=tf.float64)
         elif self.gradient_type == 2:
             self.batch_size = len(self.train_x_arr)
-            self.x = tf.placeholder(name="x", shape=(self.num_inputs, self.batch_size), dtype=tf.float64)
-            # expected result
-            self.y = tf.placeholder(name="y", shape=(self.batch_size), dtype=tf.float64)
-
+        # input variable
+        self.x = tf.placeholder(name="x", shape=(self.num_inputs, self.batch_size), dtype=tf.float64)
+        # variable for expected result
+        self.y = tf.placeholder(name="y", shape=(self.batch_size), dtype=tf.float64)
+        # add all the variables to a collection, so that they are
+        # aveilable on demand
         tf.add_to_collection("xVar", self.x)
         tf.add_to_collection("yVar", self.y)
 
     def triangular_mf(self, x, par, name):
         # we define the triangular function
         if self.mf_type == 0:
+            # we split the traingular space into two
+            # the left side
+            # we calculate the membership of x to the left side
+            # we get a negative value if x is not part of the space
             dividend_left = tf.subtract(x, par[0])
             divider_left = tf.subtract(par[1], par[0])
             division_left = tf.divide(dividend_left, divider_left)
-            #
+            # we calculate the membership of x to the right side
             dividend_right = tf.subtract(par[2], x)
             divider_right = tf.subtract(par[2], par[1])
             division_right = tf.divide(dividend_right, divider_right)
-            #
+            # we get the lowest value
             minim = tf.minimum(division_left, division_right)
+            # then we calculate the highest of 0 and the previous value
             maxim = tf.maximum(minim, tf.cast(0.0, tf.float64))
             return maxim
         elif self.mf_type==1:
+            # first we calculate the dividend. We subtract the middle parameter of the mf with x
             dividend = tf.abs(tf.subtract(par[1], x))
+            # then we subtract the two boundary parameters of the membership function
             divider = tf.subtract(par[2], par[0])
+            # we divide the two values to get the output of the memberhip function
             op = tf.divide(dividend, divider)
+            # then we multiply it by 2, because we devide it by the whole length of the triangle
+            # and not just half of the length.
             mul = tf.multiply(tf.cast([2.], tf.float64), op)
+            # we subtract 1 from it so we always either have a positive value when x is a member
+            # of the set, or we get a negative value
             sub = tf.subtract(tf.cast([1.], tf.float64), mul)
+            # we calculate the maximum of the value from the mf and 0, this way we don't take variables that are outside
+            # the range of the membership function
             maxim = tf.maximum(tf.cast([0.], tf.float64), sub, name=name)
             return maxim
 
@@ -211,10 +223,13 @@ class Anfis:
                 val = val + val_inc
 
                 self.var[i][f] = a, m, b
+                self.constraints.append(tf.assign(a, tf.clip_by_value(a, self.range[0], m)))
+                self.constraints.append(tf.assign(b, tf.clip_by_value(b, m, self.range[1])))
+                self.constraints.append(tf.assign(m, tf.clip_by_value(m, self.range[0], self.range[1])))
 
-                self.constraints.append(tf.assign(a, tf.clip_by_value(a, self.range[0], m - 1e-2)))
-                self.constraints.append(tf.assign(b, tf.clip_by_value(b, m + 1e-2, self.range[1])))
-                self.constraints.append(tf.assign(m, tf.clip_by_value(m, self.range[0] + 0.1, self.range[1] - 0.1)))
+                # self.constraints.append(tf.assign(a, tf.clip_by_value(a, self.range[0], m - 1e-2)))
+                # self.constraints.append(tf.assign(b, tf.clip_by_value(b, m + 1e-2, self.range[1])))
+                # self.constraints.append(tf.assign(m, tf.clip_by_value(m, self.range[0] + 0.1, self.range[1] - 0.1)))
                 if f > 0:
                     self.constraints.append(tf.assign(a, tf.clip_by_value(a, self.range[0], self.var[i][f - 1][2] - 1)))
                 self.premises[i][f] = self.triangular_mf(self.x[i], self.var[i][f], "test_mf" + str(i) + str(f))
@@ -416,14 +431,27 @@ class Anfis:
         n = self.fileName + ' 1 Input ' + str(self.num_sets) + ' Sets ' + str(iterations) + ' Epochs ' + batch_types[
             self.gradient_type] + ' ' + mf_types[self.mf_type]
 
+        # graphics data
+        d = self.fileName + ' 1 Input ' + str(self.num_sets) + ' Sets ' + str(iterations) + ' Epochs'
+
         folder = self.fileName + '/' + batch_types[self.gradient_type].split(' ')[0] + '/'
 
         fig.savefig('../graphics/fifthgraphics/' + folder +
                     n + '.png')
 
         row_data = [[n, str(end - start), str(v), batch_types[self.gradient_type], mf_types[self.mf_type]]]
+        graphics_row_data = [[d, str(end - start), str(v), batch_types[self.gradient_type], mf_types[self.mf_type]]]
         print(row_data)
         write_in_csv('../csvFiles/model_results.csv', row_data)
+
+        # write_in_csv('../csvFiles/parabola_1000.csv', graphics_row_data)
+
+        a_y = sess.run(self.a_y)
+        a_0 = sess.run(self.a_0)
+        print("a_0", a_0)
+        print("a_y:", a_y)
+
+        self.__write_conc_param(a_0, a_y, '../graphics/fifthgraphics/' + folder + n + ".txt")
 
         return end - start
 
@@ -456,3 +484,19 @@ class Anfis:
             batch_y.append(self.train_y_arr[i][0])
 
         return batch_x, batch_y
+
+    def __write_conc_param(self, a0, ay, file):
+        f = open(file, "w+")
+        index = 1
+
+        for i in a0:
+            x_index = 1
+            f.write("f%s(x) = %s" % (index, i[0]))
+            for k in ay:
+                f.write(" + (%s*x%s)" % (k, x_index))
+                x_index += 1
+            index += 1
+            f.write("\n")
+        # f.write("a_0: %s \n" % a0)
+        # f.write("a_y: %s" % ay)
+        f.close()

@@ -28,10 +28,29 @@ from utils.file_reader import createFile
 # Parabola
 z1 = np.linspace(-100, 100, 1000)
 y = (z1)*(z1)
-#
-z1.resize(len(z1), 1)
+
 y.resize(1, len(y))
+z1.resize(len(z1), 1)
 createFile(z1, y, "parabola_1000.out")
+
+arr1 = np.linspace(-50, 50, 1000)
+
+arr2 = np.linspace(0, 100, 1000)
+
+y = (arr1)*(arr1) + (arr2)
+
+#
+arr1.resize(len(arr1), 1)
+arr2.resize(len(arr2), 1)
+
+print(y)
+
+two_inp = np.append(arr1, arr2, 1)
+
+print(two_inp)
+
+y.resize(1, len(y))
+createFile(two_inp, y, "two_input_equation.out")
 # ma = np.concatenate((z1,y), axis=0)
 #
 # np.savetxt('parabola_values.out', ma,  delimiter = ',')

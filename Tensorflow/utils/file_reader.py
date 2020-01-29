@@ -112,6 +112,8 @@ def createFile(xArr, yArr, name):
 
     file.close()
 
+
+
 # xArr, yArr = readFile("test2.txt")
 
 # print(xArr, yArr)
