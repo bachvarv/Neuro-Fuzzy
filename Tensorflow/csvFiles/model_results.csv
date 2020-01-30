@@ -283,3 +283,5 @@ parabola_1000 1 Input 5 Sets 10000 Epochs Mini-Batch Gradient Descent two equati
 parabola_1000 1 Input 5 Sets 10000 Epochs Mini-Batch Gradient Descent two equations mf,34.293371353000005,nan,Mini-Batch Gradient Descent,two equations mf
 parabola_1000 1 Input 2 Sets 25 Epochs Mini-Batch Gradient Descent two equations mf,0.21454728700000025,18857350.0,Mini-Batch Gradient Descent,two equations mf
 parabola_1000 1 Input 2 Sets 25 Epochs Mini-Batch Gradient Descent two equations mf,0.17926659000000011,18853662.0,Mini-Batch Gradient Descent,two equations mf
+parabola_1000 1 Input 2 Sets 50 Epochs Mini-Batch Gradient Descent two equations mf,0.24753023500000015,17674024.0,Mini-Batch Gradient Descent,two equations mf
+parabola_1000 1 Input 2 Sets 50 Epochs Mini-Batch Gradient Descent two equations mf,0.24785715300000088,20040216.0,Mini-Batch Gradient Descent,two equations mf

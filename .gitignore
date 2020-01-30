@@ -107,6 +107,7 @@ venv.bak/
 .idea/
 
 # Tensorflow output folder
+graphics/
 output/
 output_test/
 *.pb

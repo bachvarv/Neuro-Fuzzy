@@ -256,7 +256,8 @@ class Anfis:
         self.normalizedMFs = tf.divide(self.mf, self.mf_sum)
 
     def define_conclusions(self):
-        self.conclusions = tf.add(self.a_0, tf.multiply(self.x, self.a_y), name="outputs")
+        for i in range(self.num_rules):
+            self.conclusions = tf.add(self.a_0, tf.multiply(self.x, self.a_y), name="outputs")
 
     def fifth_layer(self):
         self.outputs = tf.multiply(self.normalizedMFs, self.conclusions)

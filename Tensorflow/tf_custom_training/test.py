@@ -6,15 +6,15 @@ import time
 from ANFIS.anfis import Anfis
 
 start = time.process_time()
-num_sets = 2
+num_sets = 1
 
 f = Anfis(num_sets=num_sets,
-          path="../utils/parabola_1000.out", gradient_type=1, mf_type=0)
+          path="../utils/two_input_equation.out", gradient_type=1, mf_type=0)
 
 with f.sess as sess:
     sess.run(f.get_variable_initializer())
 
-    print("Training Time %fs." % f.train(sess, 5))
+    print("Training Time %fs." % f.train(sess, 10))
     print("-----------------------------------------------------")
 
     a_y = sess.run(f.a_y)
