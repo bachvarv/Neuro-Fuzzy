@@ -1,0 +1,77 @@
+Type,Time,Error,Gradient Type,MF Type
+sinus 1 Input 10 Sets 50000 Epochs,283.664781206,8.0891635E-07,Batch Gradient Descent,two equations mf
+sinus 1 Input 10 Sets 10000 Epochs,55.605003015,5.942295E-06,Batch Gradient Descent,two equations mf
+1 Input 5 Sets 500 Epochs Mini-Batch,1.921125198,5.7435118E-05,Mini-Batch Gradient Descent,two equations mf
+1 Input 4 Sets 1000 Epochs Batch,3.018810386,7.3888325E-05,Batch Gradient Descent,two equations mf
+1 Input 5 Sets 25000 Epochs Mini-Batch,80.91809637,7.613514E-05,Mini-Batch Gradient Descent,two equations mf
+1 Input 4 Sets 5000 Epochs Mini-Batch,14.430651622,9.595953E-05,Mini-Batch Gradient Descent,two equations mf
+1 Input 5 Sets 1000 Epochs Batch,3.519503158,0.0001241502,Batch Gradient Descent,two equations mf
+1 Input 5 Sets 5000 Epochs Mini-Batch,16.433484347,0.00014392514,Mini-Batch Gradient Descent,two equations mf
+1 Input 3 Sets 5000 Epochs Mini-Batch,12.479160914,0.00017558844,Mini-Batch Gradient Descent,two equations mf
+1 Input 5 Sets 5000 Epochs Batch,16.691901044,0.00019439455,Batch Gradient Descent,two equations mf
+sinus 1 Input 3 Sets 500 Epochs ,1.433071583,0.00019993485,Mini-Batch Gradient Descent,two equations mf
+sinus 1 Input 3 Sets 200 Epochs,0.662374144,0.00021371334,Batch Gradient Descent,two equations mf
+sinus 1 Input 3 Sets 1000 Epochs,2.528284161,0.00021747834,Batch Gradient Descent,two equations mf
+sinus 1 Input 4 Sets 1000 Epochs ,3.186768601,0.00022743008,Mini-Batch Gradient Descent,two equations mf
+sinus 1 Input 10 Sets 50000 Epochs ,266.304404533,0.00023102477,Mini-Batch Gradient Descent,two equations mf
+sinus 1 Input 3 Sets 250 Epochs ,0.812814455999999,0.00023668594,Mini-Batch Gradient Descent,two equations mf
+sinus 1 Input 4 Sets 500 Epochs ,1.660380155,0.00024776589,Mini-Batch Gradient Descent,two equations mf
+sinus 1 Input 3 Sets 1000 Epochs ,2.630359307,0.00026092606,Mini-Batch Gradient Descent,two equations mf
+sinus 1 Input 4 Sets 200 Epochs,0.776607018,0.0002843869,Batch Gradient Descent,two equations mf
+sinus 1 Input 5 Sets 100 Epochs,0.585141894,0.0003327774,Batch Gradient Descent,two equations mf
+sinus 1 Input 4 Sets 250 Epochs ,0.941490224,0.00035056792,Mini-Batch Gradient Descent,two equations mf
+sinus 1 Input 3 Sets 100 Epochs,0.413208351,0.0004194537,Batch Gradient Descent,two equations mf
+sinus 1 Input 4 Sets 100 Epochs,0.498050516,0.00047467268,Batch Gradient Descent,two equations mf
+sinus 1 Input 5 Sets 250 Epochs ,1.089740684,0.0004843186,Mini-Batch Gradient Descent,two equations mf
+sinus 1 Input 5 Sets 50 Epochs,0.436709294,0.0033160818,Batch Gradient Descent,two equations mf
+sinus 1 Input 4 Sets 50 Epochs,0.375220762,0.0049143583,Batch Gradient Descent,two equations mf
+sinus 1 Input 5 Sets 50 Epochs ,0.435664606,0.0058649997,Mini-Batch Gradient Descent,two equations mf
+sinus 1 Input 4 Sets 50 Epochs ,0.3765455,0.0069568525,Mini-Batch Gradient Descent,two equations mf
+sinus 1 Input 3 Sets 50 Epochs,0.300153276,0.043162756,Batch Gradient Descent,two equations mf
+sinus 1 Input 3 Sets 50 Epochs ,0.298075008,0.0460837,Mini-Batch Gradient Descent,two equations mf
+sinus 1 Input 3 Sets 4000 Epochs,10.88261874,0.1184726,Stochastic Gradient Descent,two equations mf
+sinus 1 Input 4 Sets 10 Epochs,0.234746173,0.12300181,Batch Gradient Descent,two equations mf
+sinus 1 Input 4 Sets 10 Epochs,0.348433566,0.13251883,Batch Gradient Descent,two equations mf
+sinus 1 Input 3 Sets 10 Epochs,0.183020726,0.13380256,Batch Gradient Descent,two equations mf
+sinus 1 Input 2 Sets 100000 Epochs,196.641315497,0.13913244,Batch Gradient Descent,two equations mf
+sinus 1 Input 2 Sets 10000 Epochs,19.527086167,0.13913299,Batch Gradient Descent,two equations mf
+sinus 1 Input 2 Sets 2000 Epochs,4.083490881,0.13913393,Batch Gradient Descent,two equations mf
+sinus 1 Input 2 Sets 3000 Epochs,5.996028459,0.13913395,Batch Gradient Descent,two equations mf
+sinus 1 Input 2 Sets 6000 Epochs,12.217833476,0.13913426,Batch Gradient Descent,two equations mf
+sinus 1 Input 2 Sets 1000 Epochs,2.099526972,0.13913532,Batch Gradient Descent,two equations mf
+sinus 1 Input 2 Sets 200 Epochs,0.522632314,0.13913572,Batch Gradient Descent,two equations mf
+sinus 1 Input 2 Sets 4000 Epochs,7.974327438,0.13913935,Batch Gradient Descent,two equations mf
+sinus 1 Input 2 Sets 5000 Epochs,10.044357487,0.13915023,Batch Gradient Descent,two equations mf
+sinus 1 Input 2 Sets 100 Epochs,0.319287813,0.13920735,Batch Gradient Descent,two equations mf
+sinus 1 Input 2 Sets 100 Epochs ,0.338683449,0.1395657,Mini-Batch Gradient Descent,two equations mf
+sinus 1 Input 2 Sets 5000 Epochs ,10.597227273,0.14098115,Mini-Batch Gradient Descent,two equations mf
+sinus 1 Input 2 Sets 500 Epochs ,1.181918612,0.1418811,Mini-Batch Gradient Descent,two equations mf
+sinus 1 Input 2 Sets 50 Epochs ,0.239228847,0.14503168,Mini-Batch Gradient Descent,two equations mf
+sinus 1 Input 2 Sets 50 Epochs,0.227475816,0.14849685,Batch Gradient Descent,two equations mf
+sinus 1 Input 5 Sets 10 Epochs,0.303449373999999,0.16484275,Batch Gradient Descent,two equations mf
+sinus 1 Input 2 Sets 2000 Epochs,3.740787268,0.20204479,Stochastic Gradient Descent,two equations mf
+sinus 1 Input 5 Sets 4000 Epochs,12.022375578,0.22421342,Stochastic Gradient Descent,two equations mf
+sinus 1 Input 2 Sets 40000 Epochs,72.107366955,0.24600567,Stochastic Gradient Descent,two equations mf
+sinus 1 Input 2 Sets 20 Epochs,0.160436168,0.25708038,Batch Gradient Descent,two equations mf
+sinus 1 Input 2 Sets 4000 Epochs,7.295903508,0.25798416,Stochastic Gradient Descent,two equations mf
+sinus 1 Input 2 Sets 8000 Epochs,14.569233853,0.2583701,Stochastic Gradient Descent,two equations mf
+sinus 1 Input 2 Sets 12800 Epochs,22.824212149,0.27983758,Stochastic Gradient Descent,two equations mf
+sinus 1 Input 2 Sets 25600 Epochs,45.500840861,0.28292495,Stochastic Gradient Descent,two equations mf
+sinus 1 Input 3 Sets 40000 Epochs,88.304187969,0.28848445,Stochastic Gradient Descent,two equations mf
+sinus 1 Input 2 Sets 6400 Epochs,11.492282557,0.2914801,Stochastic Gradient Descent,two equations mf
+sinus 1 Input 2 Sets 10 Epochs,0.136772361,0.3088393,Batch Gradient Descent,two equations mf
+sinus 1 Input 5 Sets 20000 Epochs,58.798894517,0.31498647,Stochastic Gradient Descent,two equations mf
+sinus 1 Input 3 Sets 20000 Epochs,43.936918276,0.36294964,Stochastic Gradient Descent,two equations mf
+sinus 1 Input 2 Sets 2400 Epochs,4.370140017,0.36693946,Stochastic Gradient Descent,two equations mf
+sinus 1 Input 2 Sets 3200 Epochs,5.841975131,0.40842652,Stochastic Gradient Descent,two equations mf
+sinus 1 Input 2 Sets 80000 Epochs,146.429628301,0.46005294,Stochastic Gradient Descent,two equations mf
+sinus 1 Input 2 Sets 5 Epochs ,0.155057299,0.65376276,Mini-Batch Gradient Descent,two equations mf
+sinus 1 Input 8 Sets 4000 Epochs,17.413568216,0.80348945,Stochastic Gradient Descent,two equations mf
+sinus 1 Input 2 Sets 800 Epochs,1.547139642,0.951483,Stochastic Gradient Descent,two equations mf
+sinus 1 Input 2 Sets 1200 Epochs,2.269917654,1.1551384,Stochastic Gradient Descent,two equations mf
+sinus 1 Input 2 Sets 400 Epochs,0.827564902,1.3053147,Stochastic Gradient Descent,two equations mf
+sinus 1 Input 4 Sets 2 Epochs,0.224144999,1.5268357,Batch Gradient Descent,two equations mf
+sinus 1 Input 3 Sets 1 Epochs,0.162586737,2.0861676,Batch Gradient Descent,two equations mf
+sinus 1 Input 4 Sets 1 Epochs,0.239554986,2.0949678,Batch Gradient Descent,two equations mf
+sinus 1 Input 5 Sets 1 Epochs,0.289668343,2.1543944,Batch Gradient Descent,two equations mf
+sinus 1 Input 2 Sets 1 Epochs,0.127618147,2.1592715,Batch Gradient Descent,two equations mf
